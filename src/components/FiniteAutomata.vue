@@ -26,18 +26,18 @@ const words = defineModel<string[]>('words', {required: true});
 
 const dfaTransitions = computed<Record<string, Record<string, string>>>({
   get: () => {
-    const dfaTransitions: Record<string, Record<string, string>> = {};
+    const transformed: Record<string, Record<string, string>> = {};
 
     transitions.value.forEach((transition) => {
-      dfaTransitions[transition[0]] = {...(dfaTransitions[transition[0]] ?? {}), [transition[1]]: transition[2]}
+      transformed[transition[0]] = {...(transformed[transition[0]] ?? {}), [transition[1]]: transition[2]}
     })
 
-    return dfaTransitions;
+    return transformed;
   },
   set: (newValue) => {
     const newTransitions: [string, string, string][] = []
 
-    Object.entries(newValue.value).forEach((item) => {
+    Object.entries(newValue).forEach((item) => {
       Object.entries(item[1]).forEach((item2) => {
         newTransitions.push([item[0], item2[0], item2[1]]);
       })

@@ -10,18 +10,21 @@ const mapping = defineModel<Record<string, Partial<Record<string, string>>>>({re
 
 const newMappingTargetState = ref('')
 const addNewMapping = (sourceState: string, char: string) => {
-  const newMap = unref(newMappingTargetState);
+  const newMapTargetState = unref(newMappingTargetState);
+  const oldMap = unref(mapping)
 
-  mapping.value[sourceState] = {...(mapping.value[sourceState] ?? {}), [char]: newMap}
+  oldMap[sourceState] = {...(oldMap[sourceState] ?? {}), [char]: newMapTargetState}
+
+  mapping.value = oldMap
 
   newMappingTargetState.value = ''
 }
 
 const removeMapping = (sourceState: string, char: string) => {
-  const mappingValue = unref(mapping);
-  delete mappingValue[sourceState]?.[char]
+  const oldMap = unref(mapping);
+  delete oldMap[sourceState]?.[char]
 
-  mapping.value = mappingValue
+  mapping.value = oldMap
 }
 </script>
 
@@ -55,7 +58,7 @@ const removeMapping = (sourceState: string, char: string) => {
             </select>
           </td>
           <td>
-            <button class="btn" v-if="mapping[state]?.[char]" @click="() => removeMapping(state, char)">X</button>
+            <button v-if="mapping[state]?.[char]" class="btn" @click="() => removeMapping(state, char)">X</button>
           </td>
         </tr>
       </template>
@@ -73,6 +76,7 @@ const removeMapping = (sourceState: string, char: string) => {
   cursor: pointer;
   color: #fff;
 }
+
 table {
   border-spacing: 0;
   width: 100%;
