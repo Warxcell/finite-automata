@@ -7,7 +7,7 @@ import {digraph, toDot} from 'ts-graphviz';
 const props = defineProps<{
   states: string[]
   alphabet: string[]
-  transitions: [string, string, string][] | Record<string, Partial<Record<string, string>>>
+  transitions: [string, string, string][] | Record<string, Record<string, string>>
   initialState: string | undefined
   finalStates: []
   highlightStates?: Record<string, string>
@@ -46,12 +46,20 @@ onMounted(() => {
       const findNode = (name: string) => nodes.find((node) => node.id === name);
 
       if (initialState.value) {
-        g.edge([start, findNode(initialState.value)])
+        const initialStateNode = findNode(initialState.value);
+        if (initialStateNode) {
+          g.edge([start, initialStateNode])
+        }
       }
 
       if (Array.isArray(transitions.value)) {
         transitions.value.forEach((item) => {
           const highlighTransitionUnref = unref(highlightTransitions);
+          const node1 = findNode(item[0]);
+          const node2 = findNode(item[2]);
+          if (!node1 || !node2) {
+            return
+          }
           g.edge([findNode(item[0]), findNode(item[2])], {
             label: item[1],
             color: highlighTransitionUnref?.find((highlightTransition) => {
@@ -63,7 +71,13 @@ onMounted(() => {
         Object.entries(transitions.value).forEach((item) => {
           Object.entries(item[1]).forEach((item2) => {
             const highlighTransitionUnref = unref(highlightTransitions);
-            g.edge([findNode(item[0]), findNode(item2[1])], {
+
+            const node1 = findNode(item[0]);
+            const node2 = findNode(item2[1]);
+            if (!node1 || !node2) {
+              return
+            }
+            g.edge([node1, node2], {
               label: item2[0],
               color: highlighTransitionUnref?.find((highlightTransition) => {
                 return highlightTransition?.[0] === item[0] && highlightTransition?.[1] == item2[0] && highlightTransition?.[2] == item2[1];

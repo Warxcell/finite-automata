@@ -2,10 +2,13 @@
 import {computed, ref, unref, watch} from "vue";
 import {DeterministicFiniteAutomata, type FiniteAutomata, NonDeterministicFiniteAutomata} from "@/finiteAutomata";
 import Graph from "@/components/Graph.vue";
+import States from "@/components/States.vue";
+import Alphabet from "@/components/Alphabet.vue";
 import type {WatchStopHandle} from "@vue/runtime-core";
 import DeterministicFiniteAutomataTransitionTable from "@/components/DeterministicFiniteAutomataTransitionTable.vue";
 import NonDeterministicFiniteAutomataTransitionTable
   from "@/components/NonDeterministicFiniteAutomataTransitionTable.vue";
+import {useItems} from "@/composables/useItems";
 
 
 enum FiniteAutomataType {
@@ -20,67 +23,38 @@ watch(type, () => {
   ndfaTransitions.value = []
 })
 
-const useDefinition = (removeCallback?: (state: string) => void) => {
-  const values = ref<string[]>([])
-  const newValue = ref<string>('')
+const states = ref<string[]>(['q0', 'q1', 'q2', 'q3']);
+const alphabet = ref<string[]>(['0', '1']);
 
-  const add = () => {
-    values.value.push(newValue.value)
-
-    newValue.value = ''
-  }
-
-  const remove = (value: string) => {
-    values.value.splice(values.value.indexOf(value), 1)
-
-    if (removeCallback) {
-      removeCallback(value)
-    }
-  }
-
-  return {
-    values,
-    newValue,
-    add,
-    remove
-  }
-}
-
-
-const {values: states, newValue: newState, add: addState, remove: removeState} = useDefinition((state) => {
+watch(() => states.value, (newStates) => {
   const mappingValue = unref(dfaTransitions);
-  delete mappingValue[state];
-
   Object.entries(mappingValue).forEach((item) => {
     Object.entries(item[1]).forEach((item2) => {
-      if (item2[1] === state) {
+      if (!newStates.includes(item[0]) || !newStates.includes(item2[1])) {
         delete mappingValue[item[0]][item2[0]];
       }
     })
   })
 
-  const indexOf = finalStates.value.indexOf(state);
+  dfaTransitions.value = mappingValue;
 
-  if (indexOf !== -1) {
-    finalStates.value.splice(indexOf, 1)
-  }
+  finalStates.value = finalStates.value.filter((item) => newStates.includes(item));
 
-  if (initialState.value === state) {
+  if (initialState.value && !newStates.includes(initialState.value)) {
     initialState.value = undefined;
   }
 
-  dfaTransitions.value = mappingValue
+  ndfaTransitions.value = ndfaTransitions.value.filter((item) => newStates.includes(item[0]) || newStates.includes(item[2]))
+}, {
+  deep: true
+})
 
-
-  ndfaTransitions.value = ndfaTransitions.value.filter((item) => item[0] === state || item[1] === state)
-});
-
-const {values: alphabet, newValue: newChar, add: addChar, remove: removeChar} = useDefinition((char) => {
+watch(alphabet, (newAlphabet) => {
   const mappingValue = unref(dfaTransitions);
 
   Object.entries(mappingValue).forEach((item) => {
     Object.entries(item[1]).forEach((item2) => {
-      if (item2[0] === char) {
+      if (!newAlphabet.includes(item2[0])) {
         delete mappingValue[item[0]][item2[0]];
       }
     })
@@ -88,16 +62,14 @@ const {values: alphabet, newValue: newChar, add: addChar, remove: removeChar} = 
 
   dfaTransitions.value = mappingValue
 
-  ndfaTransitions.value = ndfaTransitions.value.filter((item) => item[1] === char)
-});
-
-
-states.value = ['q0', 'q1', 'q2', 'q3'];
-alphabet.value = ['0', '1']
+  ndfaTransitions.value = ndfaTransitions.value.filter((item) => newAlphabet.includes(item[1]))
+}, {
+  deep: true
+})
 
 const initialState = ref<string | undefined>('q0');
 
-const dfaTransitions = ref<Record<string, Partial<Record<string, string>>>>({
+const dfaTransitions = ref<Record<string, Record<string, string>>>({
   'q0': {'0': 'q0', '1': 'q1'},
   'q1': {'0': 'q2', '1': 'q1'},
   'q2': {'0': 'q0', '1': 'q3'},
@@ -115,22 +87,8 @@ const ndfaTransitions = ref<[string, string, string][]>([
   ['q3', '1', 'q3'],
 ]);
 
-
 const finalStates = ref(['q3']);
 
-const invert = () => {
-  states.value.forEach((item) => {
-    toggleState(item)
-  })
-}
-
-const toggleState = (state: string) => {
-  if (finalStates.value.includes(state)) {
-    finalStates.value.splice(finalStates.value.indexOf(state), 1);
-  } else {
-    finalStates.value.push(state)
-  }
-}
 
 const fa = computed((): FiniteAutomata<any, any, any, any, any> | { error: string } => {
   if (!initialState.value) {
@@ -155,8 +113,9 @@ const fa = computed((): FiniteAutomata<any, any, any, any, any> | { error: strin
   }
 })
 
+const words = ref<string[]>([])
 
-const {values: words, newValue: newWord, add: addWord, remove: removeWord} = useDefinition();
+const {newValue: newWord, add: addWord, remove: removeWord} = useItems(words);
 
 const wordStatuses = computed(() => {
   const dfaUnref = unref(fa);
@@ -232,48 +191,12 @@ const nextStep = () => {
   <div class="states">
     Състояния:
 
-    <button @click="invert">Инверсия</button>
-
-    <table>
-      <thead>
-      <tr>
-        <th>Начално?</th>
-        <th>Финално?</th>
-        <th>Име</th>
-        <th>Изтрий</th>
-      </tr>
-      </thead>
-      <tbody>
-
-      <tr v-for="state in states" class="state">
-        <td><input v-model="initialState" :value="state" type="radio"/></td>
-        <td><input :id="`${state}-checkbox`" v-model="finalStates" :value="state" type="checkbox"/></td>
-        <td :class="{final: finalStates.includes(state)}">
-          {{ state }}
-        </td>
-        <td>
-          <button @click="() => removeState(state)">x</button>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-
-    <span>
-        <input v-model="newState" type="text" @change="addState">
-    </span>
+    <States v-model:final-states="finalStates" v-model:initial-state="initialState" v-model:states="states"/>
   </div>
 
   <div class="alphabet">
     Азбука:
-    <div v-for="char in alphabet">
-      <button>
-        {{ char }}
-      </button>
-      <button @click="() => removeChar(char)">x</button>
-    </div>
-    <span>
-        <input v-model="newChar" type="text" @change="addChar">
-    </span>
+    <Alphabet v-model="alphabet"/>
   </div>
 
 
