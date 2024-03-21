@@ -188,105 +188,181 @@ const nextStep = () => {
 </script>
 
 <template>
-  <div class="states">
-    Състояния:
 
-    <States v-model:final-states="finalStates" v-model:initial-state="initialState" v-model:states="states"/>
-  </div>
+  <div class="container">
+    <h1 class="main-title">Симулация на крайни автомати</h1>
+    <div class="states setting-item">
+      <h2>Състояния</h2>
 
-  <div class="alphabet">
-    Азбука:
-    <Alphabet v-model="alphabet"/>
-  </div>
-
-
-  <div>
-    Функция на състоянията
-
-    <label>
-      Определен
-      <input v-model="type" :value="FiniteAutomataType.DETERMINISTIC" type="radio"/>
-    </label>
-    <label>
-      Неопределен
-      <input v-model="type" :value="FiniteAutomataType.NON_DETERMINISTIC" type="radio"/>
-    </label>
-
-    <div v-if="type === FiniteAutomataType.DETERMINISTIC">
-      <DeterministicFiniteAutomataTransitionTable v-model="dfaTransitions" :alphabet :states/>
+      <States v-model:final-states="finalStates" v-model:initial-state="initialState" v-model:states="states"/>
     </div>
-    <div v-else>
-      <NonDeterministicFiniteAutomataTransitionTable v-model="ndfaTransitions" :alphabet :states/>
-    </div>
-  </div>
 
-  <div v-if="'error' in fa" class="dfa-error">
-    Грешка при конструкцията на автомата: {{ fa.error }}
-  </div>
-  <div v-else>
-    Напълно определен ли е автомата? {{ fa.isComplete() ? "ДА" : "НЕ" }}
-
-    <Graph :alphabet="fa.alphabet" :finalStates="fa.finalStates" :highlightStates :highlightTransitions
-           :initialState="fa.initialState" :states="fa.states" :transitions="fa.transitions"/>
-
-    <template v-if="fa instanceof NonDeterministicFiniteAutomata">
-      ОПРЕДЕЛЕН АВТОМАТ
-
-      <Graph :alphabet="fa.deterministicFiniteAutomata.alphabet"
-             :finalStates="fa.deterministicFiniteAutomata.finalStates"
-             :highlightStates :highlightTransitions
-             :initialState="fa.deterministicFiniteAutomata.initialState" :states="fa.deterministicFiniteAutomata.states"
-             :transitions="fa.deterministicFiniteAutomata.transitions"/>
-    </template>
-  </div>
-
-  <div v-if="replayIndex !== null" class="replay">
-    <button :disabled="charIndex === 0" @click="prevStep">Предна стъпка</button>
-
-    <span v-for="(char, i) in words[replayIndex]" :class="{current: charIndex === i}">{{ char }}</span>
-
-    <button :disabled="wordStatuses?.[replayIndex].steps[charIndex+1] === undefined" @click="nextStep">Следваща
-      стъпка
-    </button>
-  </div>
-
-
-  <div class="words">
-    Words:
-    <div v-for="(word, i) in words">
-      <input v-model="words[i]" type="text"/>
-
-      <button @click="() => removeWord(word)">
-        X
-      </button>
-
-      <span v-if="wordStatuses" :class="{ok: wordStatuses[i].recognized}" class="status">
-        {{ wordStatuses[i].recognized ? "ДА" : "НЕ" }}
-
-        <button v-if="replayIndex !== i"
-                @click="replay(i)">Пусни</button>
-        <button v-else @click="replay(null)">Спри</button>
-      </span>
-      <span v-else>
-        Грешка
-      </span>
+    <div class="alphabet setting-item">
+      <h2>Азбука</h2>
+      <Alphabet v-model="alphabet"/>
     </div>
 
 
-    <input v-model="newWord" type="text" @change="addWord"/>
+    <div class="setting-item">
+      <h2>Функция на състоянията</h2>
+      <div>
+        <label>
+          <input v-model="type" :value="FiniteAutomataType.DETERMINISTIC" type="radio"/>
+          Определен
+        </label>
+        <label>
+          <input v-model="type" :value="FiniteAutomataType.NON_DETERMINISTIC" type="radio"/>
+          Неопределен
+        </label>
+      </div>
+
+      <div v-if="type === FiniteAutomataType.DETERMINISTIC">
+        <DeterministicFiniteAutomataTransitionTable v-model="dfaTransitions" :alphabet :states/>
+      </div>
+      <div v-else>
+        <NonDeterministicFiniteAutomataTransitionTable v-model="ndfaTransitions" :alphabet :states/>
+      </div>
+    </div>
+
+    <div class="result-holder">
+      <div class="setting-item">
+        <div v-if="'error' in fa" class="dfa-error">
+          <h2>Грешка при конструкцията на автомата: {{ fa.error }}</h2>
+        </div>
+        <div v-else>
+          <h2 class="is-diterm">Aвтомата <strong>{{ fa.isComplete() ? "Е" : "НЕ Е" }}</strong> напълно определен!</h2>
+
+          <Graph :alphabet="fa.alphabet" :finalStates="fa.finalStates" :highlightStates :highlightTransitions
+                 :initialState="fa.initialState" :states="fa.states" :transitions="fa.transitions"/>
+
+          <template v-if="fa instanceof NonDeterministicFiniteAutomata">
+            ОПРЕДЕЛЕН АВТОМАТ
+
+            <Graph :alphabet="fa.deterministicFiniteAutomata.alphabet"
+                   :finalStates="fa.deterministicFiniteAutomata.finalStates"
+                   :highlightStates :highlightTransitions
+                   :initialState="fa.deterministicFiniteAutomata.initialState" :states="fa.deterministicFiniteAutomata.states"
+                   :transitions="fa.deterministicFiniteAutomata.transitions"/>
+          </template>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <h2>Проверка на дума</h2>
+
+        <div v-if="replayIndex !== null" class="replay">
+          <button class="btn" :disabled="charIndex === 0" @click="prevStep">Предна стъпка</button>
+
+          <span v-for="(char, i) in words[replayIndex]" :class="{current: charIndex === i}">{{ char }}</span>
+
+          <button class="btn" :disabled="wordStatuses?.[replayIndex].steps[charIndex+1] === undefined" @click="nextStep">Следваща
+            стъпка
+          </button>
+        </div>
+        <div class="words">
+          <table>
+            <tr v-for="(word, i) in words">
+              <td><input v-model="words[i]" type="text"/></td>
+              <td> <button class="btn" @click="() => removeWord(word)"> X</button></td>
+              <td>
+              <span v-if="wordStatuses" :class="{ok: wordStatuses[i].recognized}" class="status">
+                  {{ wordStatuses[i].recognized ? "ДА" : "НЕ" }}
+                <button class="btn" v-if="replayIndex !== i" @click="replay(i)">Проследи</button>
+                <button class="btn" v-else @click="replay(null)">Спри</button>
+              </span>
+              </td>
+            </tr>
+          </table>
+
+
+
+          <input v-model="newWord" type="text" @change="addWord"/>
+        </div>
+      </div>
+    </div>
   </div>
 
 </template>
 
 <style lang="scss" scoped>
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dfa-error {
+  color: red;
+}
+
+strong {
+  font-weight: bold;
+}
+
+.btn {
+  background: #4d99ff;
+  border: solid 1px #4d99ff;
+  border-radius: 3px;
+  padding: 5px 16px;
+  cursor: pointer;
+  color: #fff;
+}
+
+table {
+  border-spacing: 0;
+  width: 100%;
+
+  th {
+    font-weight: bold;
+    padding: 5px;
+    background-color: #488cd0;
+    color: #fff;
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  td {
+    border-bottom: solid 1px #aaa;
+    padding: 5px;
+    text-align: center;
+  }
+
+  .btn {
+    background: transparent;
+    color: #4d99ff;
+    padding: 2px 10px;
+  }
+}
+
+.main-title {
+  flex: 0 0 100%;
+  text-align: center;
+}
+
+.setting-item {
+  border: solid 1px #333;
+  padding: 10px;
+  border-radius: 17px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: auto;
+}
+
+.result-holder {
+  flex: 0 0 100%;
+  display: flex;
+  gap: 10px;
+
+  .is-diterm {
+    text-align: center;
+  }
+}
+
 .replay {
   .current {
     background-color: green;
   }
-}
-
-.dfa-error {
-  background-color: red;
 }
 
 .states {
@@ -312,12 +388,11 @@ const nextStep = () => {
 }
 
 .words {
-
   .status {
-    background-color: red;
+    color: red;
 
     &.ok {
-      background-color: green;
+      color: green;
     }
   }
 }

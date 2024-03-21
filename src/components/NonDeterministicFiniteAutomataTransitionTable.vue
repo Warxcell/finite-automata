@@ -46,7 +46,7 @@ const removeMapping = (index: number) => {
       <td>{{ state[1] }}</td>
       <td>{{ state[2] }}</td>
       <td>
-        <button @click="() => removeMapping(i)">X</button>
+        <button class="btn" @click="() => removeMapping(i)">X</button>
       </td>
     </tr>
 
@@ -82,5 +82,37 @@ const removeMapping = (index: number) => {
 </template>
 
 <style lang="scss" scoped>
+.btn {
+  background: #4d99ff;
+  border: solid 1px #4d99ff;
+  border-radius: 3px;
+  padding: 5px 16px;
+  cursor: pointer;
+  color: #fff;
+}
+table {
+  border-spacing: 0;
+  width: 100%;
 
+  th {
+    font-weight: bold;
+    padding: 5px;
+    background-color: #488cd0;
+    color: #fff;
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  td {
+    border-bottom: solid 1px #aaa;
+    padding: 5px;
+    text-align: center;
+  }
+
+  .btn {
+    background: transparent;
+    color: #4d99ff;
+    padding: 2px 10px;
+  }
+}
 </style>

@@ -8,17 +8,57 @@ const {add, remove, newValue} = useItems(alphabet);
 </script>
 
 <template>
-  <div v-for="char in alphabet">
-    <button>
-      {{ char }}
-    </button>
-    <button @click="() => remove(char)">x</button>
-  </div>
+    <table>
+      <tr v-for="char in alphabet">
+        <td>{{ char }}</td>
+        <td><button class="btn" @click="() => remove(char)">x</button></td>
+      </tr>
+    </table>
   <span>
-      <input v-model="newValue" type="text" @change="add">
+      <input v-model="newValue" type="text" @change="add" maxlength ="1">
   </span>
 </template>
 
 <style lang="scss" scoped>
+.btn {
+  background: #4d99ff;
+  border: solid 1px #4d99ff;
+  border-radius: 3px;
+  padding: 5px 16px;
+  cursor: pointer;
+  color: #fff;
+}
+table {
+  border-spacing: 0;
+  width: 100%;
 
+  th {
+    font-weight: bold;
+    padding: 5px;
+    background-color: #488cd0;
+    color: #fff;
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  td {
+    border-bottom: solid 1px #aaa;
+    padding: 5px;
+    text-align: center;
+
+    &:first-child {
+      text-align: left;
+    }
+
+    &:nth-child(2) {
+      text-align: right;
+    }
+  }
+
+  .btn {
+    background: transparent;
+    color: #4d99ff;
+    padding: 2px 10px;
+  }
+}
 </style>

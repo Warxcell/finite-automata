@@ -56,7 +56,7 @@ const removeMapping = (sourceState: string, char: string) => {
             </select>
           </td>
           <td>
-            <button v-if="mapping[state]?.[char]" @click="() => removeMapping(state, char)">X</button>
+            <button class="btn" v-if="mapping[state]?.[char]" @click="() => removeMapping(state, char)">X</button>
           </td>
         </tr>
       </template>
@@ -66,5 +66,37 @@ const removeMapping = (sourceState: string, char: string) => {
 </template>
 
 <style lang="scss" scoped>
+.btn {
+  background: #4d99ff;
+  border: solid 1px #4d99ff;
+  border-radius: 3px;
+  padding: 5px 16px;
+  cursor: pointer;
+  color: #fff;
+}
+table {
+  border-spacing: 0;
+  width: 100%;
 
+  th {
+    font-weight: bold;
+    padding: 5px;
+    background-color: #488cd0;
+    color: #fff;
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  td {
+    border-bottom: solid 1px #aaa;
+    padding: 5px;
+    text-align: center;
+  }
+
+  .btn {
+    background: transparent;
+    color: #4d99ff;
+    padding: 2px 10px;
+  }
+}
 </style>
