@@ -125,7 +125,6 @@ const wordStatuses = computed(() => {
   return words.value.map((word) => dfaUnref.recognizes(word));
 })
 
-
 const charIndex = ref<number>(0)
 
 const replayIndex = ref<number | null>(null)
@@ -146,6 +145,33 @@ const replay = (index: number | null) => {
     });
   }
 }
+
+const transitionsBreadcrumbs = computed((): { label: string, highlight: boolean }[] => {
+  const statuses = unref(wordStatuses)
+  const replayIndexValue = unref(replayIndex)
+  if (replayIndexValue === null || !statuses || statuses?.[replayIndexValue].steps.length === 0) {
+    return [];
+  }
+
+  const steps = statuses[replayIndexValue].steps
+
+  const breadcrumbs = [];
+  breadcrumbs.push({label: steps[0].sourceState, highlight: charIndex.value === 0});
+
+  for (let i = 0; i < steps.length; i++) {
+    const item = steps[i]
+    breadcrumbs.push(({label: item.char, highlight: i === charIndex.value}))
+
+    const highlight = i === charIndex.value || i + 1 === charIndex.value;
+    if (item.targetState) {
+      breadcrumbs.push({label: item.targetState, highlight})
+    } else {
+      breadcrumbs.push({label: 'Липсва преход', highlight})
+    }
+  }
+
+  return breadcrumbs;
+})
 
 const highlightStates = computed((): Record<string, string> | undefined => {
   if (replayIndex.value === null || typeof wordStatuses.value?.[replayIndex.value] === 'undefined') {
@@ -266,6 +292,12 @@ const nextStep = () => {
                   @click="nextStep">Следваща
             стъпка
           </button>
+
+          <div class="transitions-breadcrumbs">
+            <span v-for="(item) in transitionsBreadcrumbs">
+              <span :class="{highlight: item.highlight}">{{ item.label }}</span>
+            </span>
+          </div>
         </div>
         <div class="words">
           <table>
@@ -294,6 +326,16 @@ const nextStep = () => {
 </template>
 
 <style lang="scss" scoped>
+.transitions-breadcrumbs {
+  span {
+    margin-right: 10px;
+
+    &.highlight {
+      background-color: red;
+    }
+  }
+}
+
 .container {
   display: flex;
   flex-wrap: wrap;
