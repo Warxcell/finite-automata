@@ -4,19 +4,23 @@ import {useItems} from "@/composables/useItems";
 
 const alphabet = defineModel<string[]>({required: true})
 
-const {add, remove, newValue} = useItems(alphabet);
+const {add, remove, newValue, error} = useItems(alphabet);
 </script>
 
 <template>
-    <table>
-      <tr v-for="char in alphabet">
-        <td>{{ char }}</td>
-        <td><button class="btn" @click="() => remove(char)">x</button></td>
-      </tr>
-    </table>
-  <span>
-      <input v-model="newValue" type="text" @change="add" maxlength ="1">
-  </span>
+  <table>
+    <tr v-for="char in alphabet">
+      <td>{{ char }}</td>
+      <td>
+        <button class="btn" @click="() => remove(char)">x</button>
+      </td>
+    </tr>
+  </table>
+  <div>
+    <input v-model="newValue" maxlength="1" type="text" @change="add">
+
+    <div v-if="error">{{ error }}</div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -28,6 +32,7 @@ const {add, remove, newValue} = useItems(alphabet);
   cursor: pointer;
   color: #fff;
 }
+
 table {
   border-spacing: 0;
   width: 100%;

@@ -6,7 +6,7 @@ const states = defineModel<string[]>('states', {required: true})
 const initialState = defineModel<string | undefined>('initialState', {required: true})
 const finalStates = defineModel<string[]>('finalStates', {required: true})
 
-const {add, remove, newValue} = useItems(states);
+const {add, remove, newValue, error} = useItems(states);
 
 
 const toggleState = (state: string) => {
@@ -50,9 +50,11 @@ const invert = () => {
     </tbody>
   </table>
 
-  <span>
-        <input v-model="newValue" type="text" @change="add">
-    </span>
+  <div>
+    <input v-model="newValue" type="text" @change="add">
+
+    <div v-if="error">{{ error }}</div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -64,6 +66,7 @@ const invert = () => {
   cursor: pointer;
   color: #fff;
 }
+
 table {
   border-spacing: 0;
   width: 100%;
