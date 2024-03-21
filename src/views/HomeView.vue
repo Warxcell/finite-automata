@@ -208,11 +208,11 @@ const nextStep = () => {
       <div>
         <label>
           <input v-model="type" :value="FiniteAutomataType.DETERMINISTIC" type="radio"/>
-          Определен
+          Детерминиран
         </label>
         <label>
           <input v-model="type" :value="FiniteAutomataType.NON_DETERMINISTIC" type="radio"/>
-          Неопределен
+          Недетерминиран
         </label>
       </div>
 
