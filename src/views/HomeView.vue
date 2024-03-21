@@ -16,8 +16,8 @@ enum FiniteAutomataType {
 const type = ref(FiniteAutomataType.DETERMINISTIC);
 
 watch(type, () => {
-  mapping.value = {};
-  ndfaMapping.value = []
+  dfaTransitions.value = {};
+  ndfaTransitions.value = []
 })
 
 const useDefinition = (removeCallback?: (state: string) => void) => {
@@ -48,7 +48,7 @@ const useDefinition = (removeCallback?: (state: string) => void) => {
 
 
 const {values: states, newValue: newState, add: addState, remove: removeState} = useDefinition((state) => {
-  const mappingValue = unref(mapping);
+  const mappingValue = unref(dfaTransitions);
   delete mappingValue[state];
 
   Object.entries(mappingValue).forEach((item) => {
@@ -69,14 +69,14 @@ const {values: states, newValue: newState, add: addState, remove: removeState} =
     initialState.value = undefined;
   }
 
-  mapping.value = mappingValue
+  dfaTransitions.value = mappingValue
 
 
-  ndfaMapping.value = ndfaMapping.value.filter((item) => item[0] === state || item[1] === state)
+  ndfaTransitions.value = ndfaTransitions.value.filter((item) => item[0] === state || item[1] === state)
 });
 
 const {values: alphabet, newValue: newChar, add: addChar, remove: removeChar} = useDefinition((char) => {
-  const mappingValue = unref(mapping);
+  const mappingValue = unref(dfaTransitions);
 
   Object.entries(mappingValue).forEach((item) => {
     Object.entries(item[1]).forEach((item2) => {
@@ -86,9 +86,9 @@ const {values: alphabet, newValue: newChar, add: addChar, remove: removeChar} = 
     })
   })
 
-  mapping.value = mappingValue
+  dfaTransitions.value = mappingValue
 
-  ndfaMapping.value = ndfaMapping.value.filter((item) => item[1] === char)
+  ndfaTransitions.value = ndfaTransitions.value.filter((item) => item[1] === char)
 });
 
 
@@ -97,14 +97,14 @@ alphabet.value = ['0', '1']
 
 const initialState = ref<string | undefined>('q0');
 
-const mapping = ref<Record<string, Partial<Record<string, string>>>>({
+const dfaTransitions = ref<Record<string, Partial<Record<string, string>>>>({
   'q0': {'0': 'q0', '1': 'q1'},
   'q1': {'0': 'q2', '1': 'q1'},
   'q2': {'0': 'q0', '1': 'q3'},
   'q3': {'0': 'q3', '1': 'q3'},
 });
 
-const ndfaMapping = ref<[string, string, string][]>([
+const ndfaTransitions = ref<[string, string, string][]>([
   ['q0', '0', 'q0'],
   ['q0', '1', 'q1'],
   ['q1', '0', 'q2'],
@@ -132,7 +132,7 @@ const toggleState = (state: string) => {
   }
 }
 
-const fa = computed((): FiniteAutomata | { error: string } => {
+const fa = computed((): FiniteAutomata<any, any, any, any, any> | { error: string } => {
   if (!initialState.value) {
     return {
       error: 'Липсва начално състояние'
@@ -142,11 +142,11 @@ const fa = computed((): FiniteAutomata | { error: string } => {
   switch (type.value) {
     case  FiniteAutomataType.DETERMINISTIC:
       return new DeterministicFiniteAutomata(
-          states.value, alphabet.value, initialState.value, mapping.value, finalStates.value
+          states.value, alphabet.value, initialState.value, dfaTransitions.value, finalStates.value
       );
     case FiniteAutomataType.NON_DETERMINISTIC:
       return new NonDeterministicFiniteAutomata(
-          states.value, alphabet.value, initialState.value, ndfaMapping.value, finalStates.value
+          states.value, alphabet.value, initialState.value, ndfaTransitions.value, finalStates.value
       );
     default:
       return {
@@ -290,10 +290,10 @@ const nextStep = () => {
     </label>
 
     <div v-if="type === FiniteAutomataType.DETERMINISTIC">
-      <DeterministicFiniteAutomataTransitionTable v-model="mapping" :alphabet :states/>
+      <DeterministicFiniteAutomataTransitionTable v-model="dfaTransitions" :alphabet :states/>
     </div>
     <div v-else>
-      <NonDeterministicFiniteAutomataTransitionTable v-model="ndfaMapping" :alphabet :states/>
+      <NonDeterministicFiniteAutomataTransitionTable v-model="ndfaTransitions" :alphabet :states/>
     </div>
   </div>
 
@@ -306,12 +306,15 @@ const nextStep = () => {
     <Graph :alphabet="fa.alphabet" :finalStates="fa.finalStates" :highlightStates :highlightTransitions
            :initialState="fa.initialState" :states="fa.states" :transitions="fa.transitions"/>
 
-    <Graph v-if="fa instanceof NonDeterministicFiniteAutomata" :alphabet="fa.deterministicFiniteAutomata.alphabet"
-           :finalStates="fa.deterministicFiniteAutomata.finalStates"
-           :highlightStates :highlightTransitions
-           :initialState="fa.deterministicFiniteAutomata.initialState" :states="fa.deterministicFiniteAutomata.states"
-           :transitions="fa.deterministicFiniteAutomata.transitions"/>
+    <template v-if="fa instanceof NonDeterministicFiniteAutomata">
+      ОПРЕДЕЛЕН АВТОМАТ
 
+      <Graph :alphabet="fa.deterministicFiniteAutomata.alphabet"
+             :finalStates="fa.deterministicFiniteAutomata.finalStates"
+             :highlightStates :highlightTransitions
+             :initialState="fa.deterministicFiniteAutomata.initialState" :states="fa.deterministicFiniteAutomata.states"
+             :transitions="fa.deterministicFiniteAutomata.transitions"/>
+    </template>
   </div>
 
   <div v-if="replayIndex !== null" class="replay">
@@ -352,7 +355,7 @@ const nextStep = () => {
 
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .replay {
   .current {
     background-color: green;
