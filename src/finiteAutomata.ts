@@ -1,3 +1,8 @@
+export enum FiniteAutomataType {
+    DETERMINISTIC,
+    NON_DETERMINISTIC
+}
+
 export type RecognizesResult = {
     recognized: boolean
     steps: RecognizedResultStep[]
@@ -73,7 +78,6 @@ export class DeterministicFiniteAutomata<State extends string, Alphabet extends 
         }
         return true;
     }
-
 
     recognizes(word: string): RecognizesResult {
         let state: State = this._initialState;

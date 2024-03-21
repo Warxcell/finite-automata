@@ -8,7 +8,6 @@ const props = defineProps<{
 
 const mapping = defineModel<Record<string, Partial<Record<string, string>>>>({required: true})
 
-
 const newMappingTargetState = ref('')
 const addNewMapping = (sourceState: string, char: string) => {
   const newMap = unref(newMappingTargetState);
