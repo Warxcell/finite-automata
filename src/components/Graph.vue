@@ -9,9 +9,9 @@ const props = defineProps<{
   alphabet: string[]
   transitions: [string, string, string][] | Record<string, Record<string, string>>
   initialState: string | undefined
-  finalStates: []
+  finalStates: string[]
   highlightStates?: Record<string, string>
-  highlightTransitions?: [[string, string, string, string]]
+  highlightTransitions?: [string, string, string, string][]
 }>()
 
 
@@ -60,7 +60,7 @@ onMounted(() => {
           if (!node1 || !node2) {
             return
           }
-          g.edge([findNode(item[0]), findNode(item[2])], {
+          g.edge([node1, node2], {
             label: item[1],
             color: highlighTransitionUnref?.find((highlightTransition) => {
               return highlightTransition?.[0] === item[0] && highlightTransition?.[1] == item[1] && highlightTransition?.[2] == item[2];

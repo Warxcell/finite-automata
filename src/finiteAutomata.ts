@@ -66,7 +66,7 @@ export class DeterministicFiniteAutomata<State extends string, Alphabet extends 
     isComplete(): boolean {
         for (let i = 0; i < this._states.length; i++) {
             for (let c = 0; c < this._alphabet.length; c++) {
-                if (!(this._states[i] in this._map) || !(this._alphabet[c] in this._map[this._states[i]])) {
+                if (typeof this._map[this._states[i]]?.[this._alphabet[c]] === 'undefined') {
                     return false;
                 }
             }

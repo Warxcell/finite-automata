@@ -147,9 +147,9 @@ const replay = (index: number | null) => {
   }
 }
 
-const highlightStates = computed(() => {
+const highlightStates = computed((): Record<string, string> | undefined => {
   if (replayIndex.value === null || typeof wordStatuses.value?.[replayIndex.value] === 'undefined') {
-    return null;
+    return undefined;
   }
 
   const step = wordStatuses.value[replayIndex.value].steps[charIndex.value];
@@ -164,9 +164,9 @@ const highlightStates = computed(() => {
   return r
 })
 
-const highlightTransitions = computed(() => {
+const highlightTransitions = computed((): [string, string, string, string][] | undefined => {
   if (replayIndex.value === null || typeof wordStatuses.value?.[replayIndex.value] === 'undefined') {
-    return null;
+    return undefined;
   }
 
   const steps = wordStatuses.value[replayIndex.value].steps;
@@ -174,7 +174,7 @@ const highlightTransitions = computed(() => {
   if (status.targetState) {
     return [[status.sourceState, status.char, status.targetState, 'red']]
   } else {
-    return null;
+    return undefined;
   }
 })
 
@@ -232,16 +232,23 @@ const nextStep = () => {
         <div v-else>
           <h2 class="is-diterm">Aвтомата <strong>{{ fa.isComplete() ? "Е" : "НЕ Е" }}</strong> напълно определен!</h2>
 
-          <Graph :alphabet="fa.alphabet" :finalStates="fa.finalStates" :highlightStates :highlightTransitions
-                 :initialState="fa.initialState" :states="fa.states" :transitions="fa.transitions"/>
+          <Graph :alphabet="fa.alphabet"
+                 :finalStates="fa.finalStates"
+                 :highlightStates
+                 :highlightTransitions
+                 :initialState="fa.initialState"
+                 :states="fa.states"
+                 :transitions="fa.transitions"/>
 
           <template v-if="fa instanceof NonDeterministicFiniteAutomata">
             ОПРЕДЕЛЕН АВТОМАТ
 
             <Graph :alphabet="fa.deterministicFiniteAutomata.alphabet"
                    :finalStates="fa.deterministicFiniteAutomata.finalStates"
-                   :highlightStates :highlightTransitions
-                   :initialState="fa.deterministicFiniteAutomata.initialState" :states="fa.deterministicFiniteAutomata.states"
+                   :highlightStates
+                   :highlightTransitions
+                   :initialState="fa.deterministicFiniteAutomata.initialState"
+                   :states="fa.deterministicFiniteAutomata.states"
                    :transitions="fa.deterministicFiniteAutomata.transitions"/>
           </template>
         </div>
@@ -251,11 +258,12 @@ const nextStep = () => {
         <h2>Проверка на дума</h2>
 
         <div v-if="replayIndex !== null" class="replay">
-          <button class="btn" :disabled="charIndex === 0" @click="prevStep">Предна стъпка</button>
+          <button :disabled="charIndex === 0" class="btn" @click="prevStep">Предна стъпка</button>
 
           <span v-for="(char, i) in words[replayIndex]" :class="{current: charIndex === i}">{{ char }}</span>
 
-          <button class="btn" :disabled="wordStatuses?.[replayIndex].steps[charIndex+1] === undefined" @click="nextStep">Следваща
+          <button :disabled="wordStatuses?.[replayIndex].steps[charIndex+1] === undefined" class="btn"
+                  @click="nextStep">Следваща
             стъпка
           </button>
         </div>
@@ -263,17 +271,18 @@ const nextStep = () => {
           <table>
             <tr v-for="(word, i) in words">
               <td><input v-model="words[i]" type="text"/></td>
-              <td> <button class="btn" @click="() => removeWord(word)"> X</button></td>
+              <td>
+                <button class="btn" @click="() => removeWord(word)"> X</button>
+              </td>
               <td>
               <span v-if="wordStatuses" :class="{ok: wordStatuses[i].recognized}" class="status">
                   {{ wordStatuses[i].recognized ? "ДА" : "НЕ" }}
-                <button class="btn" v-if="replayIndex !== i" @click="replay(i)">Проследи</button>
-                <button class="btn" v-else @click="replay(null)">Спри</button>
+                <button v-if="replayIndex !== i" class="btn" @click="replay(i)">Проследи</button>
+                <button v-else class="btn" @click="replay(null)">Спри</button>
               </span>
               </td>
             </tr>
           </table>
-
 
 
           <input v-model="newWord" type="text" @change="addWord"/>
