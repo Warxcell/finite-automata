@@ -241,7 +241,7 @@ const nextStep = () => {
                  :transitions="fa.transitions"/>
 
           <template v-if="fa instanceof NonDeterministicFiniteAutomata">
-            ОПРЕДЕЛЕН АВТОМАТ
+            ДЕТЕРМИНИРАН АВТОМАТ
 
             <Graph :alphabet="fa.deterministicFiniteAutomata.alphabet"
                    :finalStates="fa.deterministicFiniteAutomata.finalStates"
