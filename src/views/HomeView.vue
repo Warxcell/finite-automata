@@ -4,6 +4,7 @@ import FiniteAutomata from "@/components/FiniteAutomata.vue";
 import TabTitle from "@/components/TabTitle.vue";
 import {useFiniteAutomataStore} from "@/stores/finiteAutomataStore";
 import {storeToRefs} from "pinia";
+import {useRouteHash} from "@vueuse/router";
 
 const itemsStore = useFiniteAutomataStore();
 
@@ -23,11 +24,46 @@ const remove = (index: number) => {
     activeTab.value = items.value.length - 1
   }
 }
+
+const hash = useRouteHash()
+
+if (hash.value) {
+  // const parsed = typia.json.assertParse<typeof items>(hash.value.substring(1));
+  items.value = JSON.parse(hash.value.substring(1));
+  hash.value = ''
+}
+
+
+const shareButtonTextOG = 'Сподели'
+const shareButtonText = ref(shareButtonTextOG)
+const share = () => {
+  // hash.value = `#${typia.json.stringify(items.value)}`
+  hash.value = `#${JSON.stringify(items.value)}`
+
+  navigator.share({
+    url: window.location.href
+  })
+
+  navigator.clipboard.writeText(hash.value)
+      .then(() => {
+        shareButtonText.value = 'Копирано в клипборда'
+      })
+      .catch((reason) => {
+        shareButtonText.value = typeof reason === 'string' ? reason : 'Грешка при копирането в клипборда'
+      })
+      .finally(() => {
+        setTimeout(() => {
+          shareButtonText.value = shareButtonTextOG
+        }, 5000)
+      });
+}
 </script>
 
 <template>
   <div class="container">
     <h1 class="main-title">Симулация на крайни автомати</h1>
+
+    <button @click="share">{{ shareButtonText }}</button>
 
     <div>
       <TabTitle v-for="(item, key) in items"
@@ -35,20 +71,21 @@ const remove = (index: number) => {
                 :active="activeTab === key"
                 @click="activeTab = key"
                 @remove="remove(key)"/>
-    </div>
-    <button @click="add">+</button>
-  </div>
 
-  <div v-for="(item, key) in items">
-    <FiniteAutomata v-if="activeTab === key"
-                    v-model:alphabet="item.alphabet"
-                    v-model:final-states="item.finalStates"
-                    v-model:initial-state="item.initialState"
-                    v-model:states="item.states"
-                    v-model:transitions="item.transitions"
-                    v-model:type="item.type"
-                    v-model:words="item.words"
-    />
+      <button @click="add">+</button>
+    </div>
+
+    <div v-for="(item, key) in items">
+      <FiniteAutomata v-if="activeTab === key"
+                      v-model:alphabet="item.alphabet"
+                      v-model:final-states="item.finalStates"
+                      v-model:initial-state="item.initialState"
+                      v-model:states="item.states"
+                      v-model:transitions="item.transitions"
+                      v-model:type="item.type"
+                      v-model:words="item.words"
+      />
+    </div>
   </div>
 </template>
 
