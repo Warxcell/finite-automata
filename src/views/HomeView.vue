@@ -84,6 +84,7 @@ const share = () => {
                       v-model:transitions="item.transitions"
                       v-model:type="item.type"
                       v-model:words="item.words"
+                      :name="item.name"
       />
     </div>
   </div>

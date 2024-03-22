@@ -5,6 +5,7 @@ import {computed, onMounted, type Ref, ref, toRefs, unref, watch} from "vue";
 import {digraph, toDot} from 'ts-graphviz';
 
 const props = defineProps<{
+  name: string
   states: string[]
   alphabet: string[]
   transitions: [string, string, string][] | Record<string, Record<string, string>>
@@ -30,7 +31,7 @@ onMounted(() => {
 
 
   const dot = computed(() => {
-    const G = digraph('G', {rankdir: "LR"}, (g) => {
+    const G = digraph(props.name, {rankdir: "LR"}, (g) => {
 
       const start = g.node('start', {
         style: 'invis'

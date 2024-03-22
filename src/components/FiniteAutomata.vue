@@ -17,6 +17,10 @@ import {useItems} from "@/composables/useItems";
 import {assertNever} from "@/helper";
 import ClosableError from "@/components/ClosableError.vue";
 
+
+defineProps<{
+  name: string
+}>()
 const states = defineModel<string[]>('states', {required: true});
 const alphabet = defineModel<string[]>('alphabet', {required: true});
 const initialState = defineModel<string | undefined>('initialState', {required: true});
@@ -271,24 +275,28 @@ const nextStep = () => {
           </tbody>
         </table>
 
-        <Graph :alphabet="fa.alphabet"
-               :finalStates="fa.finalStates"
-               :highlightStates
-               :highlightTransitions
-               :initialState="fa.initialState"
-               :states="fa.states"
-               :transitions="fa.transitions"/>
+        <Graph
+            :alphabet="fa.alphabet"
+            :finalStates="fa.finalStates"
+            :highlightStates
+            :highlightTransitions
+            :initialState="fa.initialState"
+            :name
+            :states="fa.states"
+            :transitions="fa.transitions"/>
 
         <template v-if="fa instanceof NonDeterministicFiniteAutomata">
           ДЕТЕРМИНИРАН АВТОМАТ
 
-          <Graph :alphabet="fa.deterministicFiniteAutomata.alphabet"
-                 :finalStates="fa.deterministicFiniteAutomata.finalStates"
-                 :highlightStates
-                 :highlightTransitions
-                 :initialState="fa.deterministicFiniteAutomata.initialState"
-                 :states="fa.deterministicFiniteAutomata.states"
-                 :transitions="fa.deterministicFiniteAutomata.transitions"/>
+          <Graph
+              :alphabet="fa.deterministicFiniteAutomata.alphabet"
+              :finalStates="fa.deterministicFiniteAutomata.finalStates"
+              :highlightStates
+              :highlightTransitions
+              :initialState="fa.deterministicFiniteAutomata.initialState"
+              :name
+              :states="fa.deterministicFiniteAutomata.states"
+              :transitions="fa.deterministicFiniteAutomata.transitions"/>
         </template>
       </div>
     </div>
