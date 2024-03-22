@@ -158,7 +158,7 @@ export class NonDeterministicFiniteAutomata<State extends string, Alphabet exten
                 for (let j = 0; j < _map.length; j++) {
                     const map = _map[j];
 
-                    if (states.includes(map[0]) && map[1] === char) {
+                    if (states.includes(map[0]) && map[1] === char && !newTargetStateArray.includes(map[2])) {
                         newTargetStateArray.push(map[2]);
                     }
                 }
