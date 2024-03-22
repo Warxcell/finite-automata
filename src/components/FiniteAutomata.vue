@@ -325,7 +325,7 @@ const nextStep = () => {
           </tr>
         </table>
 
-        <input v-model="newWord" type="text" @change="addWord" @focusout="addWord"/>
+        <input v-model="newWord" type="text" @change="addWord"/>
 
         <ClosableError v-if="wordError" :error="wordError" @close="wordError = ''"/>
       </div>

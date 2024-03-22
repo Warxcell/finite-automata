@@ -18,7 +18,7 @@ const {add, remove, newValue, error} = useItems(alphabet);
     </tr>
   </table>
   <div>
-    <input v-model="newValue" maxlength="1" type="text" @change="add" @focusout="add">
+    <input v-model="newValue" maxlength="1" type="text" @change="add">
 
     <ClosableError v-if="error" :error="error" @close="error = ''"/>
   </div>

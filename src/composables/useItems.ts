@@ -13,13 +13,13 @@ export function useItems(values: Ref<string[]>) {
             return
         }
 
+        newValue.value = ''
+
         if (values.value.includes(newVal)) {
             error.value = `${newVal} вече е добавен`
             return
         }
         values.value.push(newVal)
-
-        newValue.value = ''
     }
 
     const remove = (value: string) => {
