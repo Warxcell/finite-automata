@@ -183,6 +183,12 @@ const highlightTransitions = computed((): [string, string, string, string][] | u
   }
 })
 
+const newMappingTargetState = ref('');
+const addNewMapping = (sourceState: string, char: string) => {
+  transitions.value.push([sourceState, char, newMappingTargetState.value]);
+
+  newMappingTargetState.value = ''
+}
 
 const prevStep = () => {
   charIndex.value--;
@@ -238,7 +244,7 @@ const nextStep = () => {
         <table v-if="!fa.isComplete().isComplete">
           <thead>
           <tr>
-            <th colspan="2">Липсващи преходи</th>
+            <th colspan="3">Липсващи преходи</th>
           </tr>
           </thead>
           <tbody>
@@ -248,6 +254,14 @@ const nextStep = () => {
             </td>
             <td>
               {{ item.char }}
+            </td>
+            <td>
+              <select v-model="newMappingTargetState" @change="() => addNewMapping(item.sourceState, item.char)">
+                <option></option>
+                <option v-for="state in states">
+                  {{ state }}
+                </option>
+              </select>
             </td>
           </tr>
           </tbody>
