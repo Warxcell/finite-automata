@@ -15,6 +15,7 @@ import NonDeterministicFiniteAutomataTransitionTable
   from "@/components/NonDeterministicFiniteAutomataTransitionTable.vue";
 import {useItems} from "@/composables/useItems";
 import {assertNever} from "@/helper";
+import ClosableError from "@/components/ClosableError.vue";
 
 const states = defineModel<string[]>('states', {required: true});
 const alphabet = defineModel<string[]>('alphabet', {required: true});
@@ -93,7 +94,7 @@ const fa = computed((): FiniteAutomata<any, any, any, any, any> | { error: strin
   }
 })
 
-const {newValue: newWord, add: addWord, remove: removeWord} = useItems(words);
+const {newValue: newWord, add: addWord, remove: removeWord, error: wordError} = useItems(words);
 
 const wordStatuses = computed(() => {
   const dfaUnref = unref(fa);
@@ -291,8 +292,9 @@ const nextStep = () => {
           </tr>
         </table>
 
+        <input v-model="newWord" type="text" @change="addWord" @focusout="addWord"/>
 
-        <input v-model="newWord" type="text" @change="addWord"/>
+        <ClosableError v-if="wordError" :error="wordError" @close="wordError = ''"/>
       </div>
     </div>
   </div>

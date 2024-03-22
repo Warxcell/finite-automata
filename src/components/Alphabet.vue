@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 
 import {useItems} from "@/composables/useItems";
+import ClosableError from "@/components/ClosableError.vue";
 
 const alphabet = defineModel<string[]>({required: true})
 
@@ -17,9 +18,9 @@ const {add, remove, newValue, error} = useItems(alphabet);
     </tr>
   </table>
   <div>
-    <input v-model="newValue" maxlength="1" type="text" @change="add">
+    <input v-model="newValue" maxlength="1" type="text" @change="add" @focusout="add">
 
-    <div v-if="error">{{ error }}</div>
+    <ClosableError v-if="error" :error="error" @close="error = ''"/>
   </div>
 </template>
 

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 
 import {useItems} from "@/composables/useItems";
+import ClosableError from "@/components/ClosableError.vue";
 
 const states = defineModel<string[]>('states', {required: true})
 const initialState = defineModel<string | undefined>('initialState', {required: true})
@@ -51,9 +52,9 @@ const invert = () => {
   </table>
 
   <div>
-    <input v-model="newValue" type="text" @change="add">
+    <input v-model="newValue" type="text" @change="add" @focusout="add">
 
-    <div v-if="error">{{ error }}</div>
+    <ClosableError v-if="error" :error="error" @close="error = ''"/>
   </div>
 </template>
 
