@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import {ref, unref} from "vue";
-import CustomButton from "@/components/CustomButton.vue";
 
-const props = defineProps<{
+defineProps<{
   states: string[]
   alphabet: string[]
 }>()
@@ -30,7 +29,7 @@ const removeMapping = (sourceState: string, char: string) => {
 </script>
 
 <template>
-  <table>
+  <table class="table table-xs">
     <thead>
     <tr>
       <th>Състояние</th>
@@ -43,7 +42,7 @@ const removeMapping = (sourceState: string, char: string) => {
     <tbody>
     <template v-for="(state) in states">
       <template v-for="(char) in alphabet">
-        <tr>
+        <tr class="hover">
           <td>{{ state }}</td>
           <td>{{ char }}</td>
           <td>
@@ -51,7 +50,8 @@ const removeMapping = (sourceState: string, char: string) => {
               {{ mapping[state]?.[char] }}
               </span>
 
-            <select v-else v-model="newMappingTargetState" @change="() => addNewMapping(state, char)">
+            <select v-else v-model="newMappingTargetState" class="select select-bordered select-sm w-full max-w-xs"
+                    @change="() => addNewMapping(state, char)">
               <option></option>
               <option v-for="state in states">
                 {{ state }}
@@ -59,7 +59,10 @@ const removeMapping = (sourceState: string, char: string) => {
             </select>
           </td>
           <td>
-            <CustomButton v-if="mapping[state]?.[char]" @click="() => removeMapping(state, char)">X</CustomButton>
+            <button v-if="mapping[state]?.[char]" class="btn btn-sm btn-error"
+                    @click="() => removeMapping(state, char)">
+              X
+            </button>
           </td>
         </tr>
       </template>
@@ -69,29 +72,5 @@ const removeMapping = (sourceState: string, char: string) => {
 </template>
 
 <style lang="scss" scoped>
-table {
-  border-spacing: 0;
-  width: 100%;
 
-  th {
-    font-weight: bold;
-    padding: 5px;
-    background-color: #488cd0;
-    color: #fff;
-    font-size: 12px;
-    text-transform: uppercase;
-  }
-
-  td {
-    border-bottom: solid 1px #aaa;
-    padding: 5px;
-    text-align: center;
-  }
-
-  .btn {
-    background: transparent;
-    color: #4d99ff;
-    padding: 2px 10px;
-  }
-}
 </style>

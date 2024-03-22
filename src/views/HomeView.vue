@@ -5,7 +5,6 @@ import TabTitle from "@/components/TabTitle.vue";
 import {useFiniteAutomataStore} from "@/stores/finiteAutomataStore";
 import {storeToRefs} from "pinia";
 import {useRouteHash} from "@vueuse/router";
-import CustomButton from "@/components/CustomButton.vue";
 
 const itemsStore = useFiniteAutomataStore();
 
@@ -41,11 +40,12 @@ const share = () => {
   // hash.value = `#${typia.json.stringify(items.value)}`
   hash.value = `#${JSON.stringify(items.value)}`
 
+  const url = `${window.location.origin}${window.location.pathname}${hash.value}`
   navigator.share({
-    url: window.location.href
+    url: url
   })
 
-  navigator.clipboard.writeText(hash.value)
+  navigator.clipboard.writeText(url)
       .then(() => {
         shareButtonText.value = 'Копирано в клипборда'
       })
@@ -61,53 +61,42 @@ const share = () => {
 </script>
 
 <template>
-  <div class="container">
+  <div class="container mx-auto">
     <h1 class="main-title">Симулация на крайни автомати</h1>
 
-    <CustomButton @click="share">{{ shareButtonText }}</CustomButton>
+    <button class="btn btn-info" @click="share">{{ shareButtonText }}</button>
 
-    <div class="tabs-holder">
-      <TabTitle v-for="(item, key) in items"
-                v-model:title="item.name"
-                :active="activeTab === key"
-                @click="activeTab = key"
-                @remove="remove(key)"/>
+    <div class="tabs tabs-lifted" role="tablist">
+      <template v-for="(item, key) in items">
+        <TabTitle
+            v-model:title="item.name"
+            :active="activeTab === key"
+            @click="activeTab = key"
+            @remove="remove(key)"/>
 
-      <CustomButton @click="add">+</CustomButton>
-    </div>
+        <div v-if="activeTab === key" class="tab-content p-10" role="tabpanel">
+          <FiniteAutomata
+              v-model:alphabet="item.alphabet"
+              v-model:final-states="item.finalStates"
+              v-model:initial-state="item.initialState"
+              v-model:states="item.states"
+              v-model:transitions="item.transitions"
+              v-model:type="item.type"
+              v-model:words="item.words"
+              :name="item.name"
+          />
+        </div>
+      </template>
 
-    <div v-for="(item, key) in items" class="tab-content">
-      <FiniteAutomata v-if="activeTab === key"
-                      v-model:alphabet="item.alphabet"
-                      v-model:final-states="item.finalStates"
-                      v-model:initial-state="item.initialState"
-                      v-model:states="item.states"
-                      v-model:transitions="item.transitions"
-                      v-model:type="item.type"
-                      v-model:words="item.words"
-                      :name="item.name"
-      />
+      <div class="tab">
+        <div class="tooltip" data-tip="Добави нов прозорец с автомат">
+          <button class="btn btn-success btn-xs btn-outline rounded" @click="add">+</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.tab-content {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.main-title {
-  flex: 0 0 100%;
-  text-align: center;
-}
-
-.tabs-holder {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 10px 0;
-}
 
 </style>

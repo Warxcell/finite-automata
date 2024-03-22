@@ -8,7 +8,6 @@ import {
 } from "@/finiteAutomata";
 import Graph from "@/components/Graph.vue";
 import States from "@/components/States.vue";
-import CustomButton from "@/components/CustomButton.vue";
 import Alphabet from "@/components/Alphabet.vue";
 import type {WatchStopHandle} from "@vue/runtime-core";
 import DeterministicFiniteAutomataTransitionTable from "@/components/DeterministicFiniteAutomataTransitionTable.vue";
@@ -130,7 +129,11 @@ const replay = (index: number | null) => {
   }
 }
 
-const transitionsBreadcrumbs = computed((): { label: string, highlight: boolean, final: boolean }[] => {
+const transitionsBreadcrumbs = computed((): {
+  label: string,
+  highlight: boolean,
+  final: boolean
+}[] => {
   const statuses = unref(wordStatuses)
   const replayIndexValue = unref(replayIndex)
   if (replayIndexValue === null || !statuses || statuses?.[replayIndexValue].steps.length === 0) {
@@ -250,7 +253,7 @@ const nextStep = () => {
         <h2 class="is-diterm">Aвтомата <strong>{{ fa.isComplete().isComplete ? "Е" : "НЕ Е" }}</strong> напълно
           определен!</h2>
 
-        <table v-if="!fa.isComplete().isComplete">
+        <table v-if="!fa.isComplete().isComplete" class="table table-xs">
           <thead>
           <tr>
             <th colspan="3">Липсващи преходи</th>
@@ -265,7 +268,8 @@ const nextStep = () => {
               {{ item.char }}
             </td>
             <td>
-              <select v-model="newMappingTargetState" @change="() => addNewMapping(item.sourceState, item.char)">
+              <select v-model="newMappingTargetState" class="select select-bordered select-sm w-full max-w-xs"
+                      @change="() => addNewMapping(item.sourceState, item.char)">
                 <option></option>
                 <option v-for="state in states">
                   {{ state }}
@@ -306,36 +310,56 @@ const nextStep = () => {
       <h2>Проверка на дума</h2>
 
       <div v-if="replayIndex !== null" class="replay">
-        <CustomButton :disabled="charIndex === 0" @click="prevStep">Предна стъпка</CustomButton>
+        <button :disabled="charIndex === 0" class="btn btn-sm" @click="prevStep">Предна стъпка</button>
 
         <span v-for="(char, i) in words[replayIndex]" :class="{current: charIndex === i}">{{ char }}</span>
 
-        <CustomButton :disabled="wordStatuses?.[replayIndex].steps[charIndex+1] === undefined"
+        <button :disabled="wordStatuses?.[replayIndex].steps[charIndex+1] === undefined" class="btn btn-sm"
                 @click="nextStep">Следваща
           стъпка
-        </CustomButton>
+        </button>
 
-        <div class="transitions-breadcrumbs">
-            <span v-for="(item) in transitionsBreadcrumbs">
-              <span :class="{highlight: item.highlight, final: item.final}">{{ item.label }}</span>
-            </span>
+        <div class="text-sm breadcrumbs">
+          <ul>
+            <li v-for="(item) in transitionsBreadcrumbs">
+              <span :class="{highlight: item.highlight, final: item.final}" class="rounded-full">{{ item.label }}</span>
+            </li>
+          </ul>
         </div>
       </div>
+
       <div class="words">
-        <table>
-          <tr v-for="(word, i) in words">
+        <table class="table table-xs table-auto">
+          <thead>
+          <tr>
+            <th>Дума</th>
+            <th>Разпознава?</th>
+            <th>
+              <div class="tooltip" data-tip="Проследи автомата с тази дума стъпка по стъпка">
+                Проследи
+              </div>
+            </th>
+            <th>Изтрий</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(word, i) in words" class="hover">
             <td><input v-model="words[i]" type="text"/></td>
             <td>
-              <CustomButton @click="() => removeWord(word)"> X</CustomButton>
+                <span v-if="wordStatuses" :class="{ok: wordStatuses[i].recognized}" class="status">
+                    {{ wordStatuses[i].recognized ? "ДА" : "НЕ" }}
+                </span>
             </td>
             <td>
-              <span v-if="wordStatuses" :class="{ok: wordStatuses[i].recognized}" class="status">
-                  {{ wordStatuses[i].recognized ? "ДА" : "НЕ" }}
-                <CustomButton v-if="replayIndex !== i" @click="replay(i)">Проследи</CustomButton>
-                <CustomButton v-else @click="replay(null)">Спри</CustomButton>
-              </span>
+              <button v-if="replayIndex !== i" class="btn btn-info btn-sm btn-outline" @click="replay(i)">Проследи
+              </button>
+              <button v-else class="btn btn-sm btn-outline btn-info" @click="replay(null)">Спри</button>
+            </td>
+            <td>
+              <button class="btn btn-error btn-sm" @click="() => removeWord(word)">X</button>
             </td>
           </tr>
+          </tbody>
         </table>
 
         <input v-model="newWord" type="text" @change="addWord"/>
@@ -364,39 +388,12 @@ const nextStep = () => {
   }
 }
 
-
 .dfa-error {
   color: red;
 }
 
 strong {
   font-weight: bold;
-}
-
-table {
-  border-spacing: 0;
-  width: 100%;
-
-  th {
-    font-weight: bold;
-    padding: 5px;
-    background-color: #488cd0;
-    color: #fff;
-    font-size: 12px;
-    text-transform: uppercase;
-  }
-
-  td {
-    border-bottom: solid 1px #aaa;
-    padding: 5px;
-    text-align: center;
-  }
-
-  .btn {
-    background: transparent;
-    color: #4d99ff;
-    padding: 2px 10px;
-  }
 }
 
 .setting-item {

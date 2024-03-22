@@ -105,25 +105,5 @@ onMounted(() => {
 </template>
 
 <style lang="scss">
-.links {
-  stroke: #999;
-  stroke-opacity: 0.6;
-  stroke-width: 1px;
-
-  title {
-    font-size: 20px;
-  }
-}
-
-.nodes circle {
-  fill: pink;
-  stroke: #000;
-
-}
-
-text {
-  pointer-events: none;
-
-}
 
 </style>

@@ -16,7 +16,7 @@ export function useItems(values: Ref<string[]>) {
         newValue.value = ''
 
         if (values.value.includes(newVal)) {
-            error.value = `${newVal} вече е добавен`
+            error.value = `"${newVal}" вече е добавен`
             return
         }
         values.value.push(newVal)

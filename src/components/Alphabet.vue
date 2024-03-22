@@ -2,7 +2,6 @@
 
 import {useItems} from "@/composables/useItems";
 import ClosableError from "@/components/ClosableError.vue";
-import CustomButton from "@/components/CustomButton.vue";
 
 const alphabet = defineModel<string[]>({required: true})
 
@@ -10,16 +9,19 @@ const {add, remove, newValue, error} = useItems(alphabet);
 </script>
 
 <template>
-  <table>
+  <table class="table table-xs">
     <tr v-for="char in alphabet">
       <td>{{ char }}</td>
       <td>
-        <CustomButton @click="() => remove(char)">x</CustomButton>
+        <button class="btn btn-sm btn-error" @click="() => remove(char)">x</button>
       </td>
     </tr>
   </table>
   <div>
-    <input v-model="newValue" maxlength="1" type="text" @change="add">
+    <input v-model="newValue" class="input input-bordered input-sm w-full max-w-xs"
+           maxlength="1"
+           type="text"
+           @change="add">
 
     <ClosableError v-if="error" :error="error" @close="error = ''"/>
   </div>
@@ -27,37 +29,4 @@ const {add, remove, newValue, error} = useItems(alphabet);
 
 <style lang="scss" scoped>
 
-table {
-  border-spacing: 0;
-  width: 100%;
-
-  th {
-    font-weight: bold;
-    padding: 5px;
-    background-color: #488cd0;
-    color: #fff;
-    font-size: 12px;
-    text-transform: uppercase;
-  }
-
-  td {
-    border-bottom: solid 1px #aaa;
-    padding: 5px;
-    text-align: center;
-
-    &:first-child {
-      text-align: left;
-    }
-
-    &:nth-child(2) {
-      text-align: right;
-    }
-  }
-
-  .btn {
-    background: transparent;
-    color: #4d99ff;
-    padding: 2px 10px;
-  }
-}
 </style>
