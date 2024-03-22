@@ -8,6 +8,7 @@ import {
 } from "@/finiteAutomata";
 import Graph from "@/components/Graph.vue";
 import States from "@/components/States.vue";
+import CustomButton from "@/components/CustomButton.vue";
 import Alphabet from "@/components/Alphabet.vue";
 import type {WatchStopHandle} from "@vue/runtime-core";
 import DeterministicFiniteAutomataTransitionTable from "@/components/DeterministicFiniteAutomataTransitionTable.vue";
@@ -305,14 +306,14 @@ const nextStep = () => {
       <h2>Проверка на дума</h2>
 
       <div v-if="replayIndex !== null" class="replay">
-        <button :disabled="charIndex === 0" class="btn" @click="prevStep">Предна стъпка</button>
+        <CustomButton :disabled="charIndex === 0" @click="prevStep">Предна стъпка</CustomButton>
 
         <span v-for="(char, i) in words[replayIndex]" :class="{current: charIndex === i}">{{ char }}</span>
 
-        <button :disabled="wordStatuses?.[replayIndex].steps[charIndex+1] === undefined" class="btn"
+        <CustomButton :disabled="wordStatuses?.[replayIndex].steps[charIndex+1] === undefined"
                 @click="nextStep">Следваща
           стъпка
-        </button>
+        </CustomButton>
 
         <div class="transitions-breadcrumbs">
             <span v-for="(item) in transitionsBreadcrumbs">
@@ -325,13 +326,13 @@ const nextStep = () => {
           <tr v-for="(word, i) in words">
             <td><input v-model="words[i]" type="text"/></td>
             <td>
-              <button class="btn" @click="() => removeWord(word)"> X</button>
+              <CustomButton @click="() => removeWord(word)"> X</CustomButton>
             </td>
             <td>
               <span v-if="wordStatuses" :class="{ok: wordStatuses[i].recognized}" class="status">
                   {{ wordStatuses[i].recognized ? "ДА" : "НЕ" }}
-                <button v-if="replayIndex !== i" class="btn" @click="replay(i)">Проследи</button>
-                <button v-else class="btn" @click="replay(null)">Спри</button>
+                <CustomButton v-if="replayIndex !== i" @click="replay(i)">Проследи</CustomButton>
+                <CustomButton v-else @click="replay(null)">Спри</CustomButton>
               </span>
             </td>
           </tr>
@@ -370,15 +371,6 @@ const nextStep = () => {
 
 strong {
   font-weight: bold;
-}
-
-.btn {
-  background: #4d99ff;
-  border: solid 1px #4d99ff;
-  border-radius: 3px;
-  padding: 5px 16px;
-  cursor: pointer;
-  color: #fff;
 }
 
 table {

@@ -2,6 +2,7 @@
 
 import {useItems} from "@/composables/useItems";
 import ClosableError from "@/components/ClosableError.vue";
+import CustomButton from "@/components/CustomButton.vue";
 
 const alphabet = defineModel<string[]>({required: true})
 
@@ -13,7 +14,7 @@ const {add, remove, newValue, error} = useItems(alphabet);
     <tr v-for="char in alphabet">
       <td>{{ char }}</td>
       <td>
-        <button class="btn" @click="() => remove(char)">x</button>
+        <CustomButton @click="() => remove(char)">x</CustomButton>
       </td>
     </tr>
   </table>
@@ -25,14 +26,6 @@ const {add, remove, newValue, error} = useItems(alphabet);
 </template>
 
 <style lang="scss" scoped>
-.btn {
-  background: #4d99ff;
-  border: solid 1px #4d99ff;
-  border-radius: 3px;
-  padding: 5px 16px;
-  cursor: pointer;
-  color: #fff;
-}
 
 table {
   border-spacing: 0;

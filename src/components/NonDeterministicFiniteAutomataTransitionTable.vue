@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {ref} from "vue";
 import ClosableError from "@/components/ClosableError.vue";
+import CustomButton from "@/components/CustomButton.vue";
 
 const props = defineProps<{
   states: string[]
@@ -56,7 +57,7 @@ const removeMapping = (index: number) => {
       <td>{{ state[1] }}</td>
       <td>{{ state[2] }}</td>
       <td>
-        <button class="btn" @click="() => removeMapping(i)">X</button>
+        <CustomButton @click="() => removeMapping(i)">X</CustomButton>
       </td>
     </tr>
 
@@ -97,15 +98,6 @@ const removeMapping = (index: number) => {
 </template>
 
 <style lang="scss" scoped>
-.btn {
-  background: #4d99ff;
-  border: solid 1px #4d99ff;
-  border-radius: 3px;
-  padding: 5px 16px;
-  cursor: pointer;
-  color: #fff;
-}
-
 table {
   border-spacing: 0;
   width: 100%;

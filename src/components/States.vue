@@ -2,6 +2,7 @@
 
 import {useItems} from "@/composables/useItems";
 import ClosableError from "@/components/ClosableError.vue";
+import CustomButton from "@/components/CustomButton.vue";
 
 const states = defineModel<string[]>('states', {required: true})
 const initialState = defineModel<string | undefined>('initialState', {required: true})
@@ -25,7 +26,7 @@ const invert = () => {
 </script>
 
 <template>
-  <button class="btn" @click="invert">Инверсия</button>
+  <CustomButton @click="invert">Инверсия</CustomButton>
 
   <table>
     <thead>
@@ -45,7 +46,7 @@ const invert = () => {
         {{ state }}
       </td>
       <td>
-        <button class="btn" @click="() => remove(state)">x</button>
+        <CustomButton @click="() => remove(state)">x</CustomButton>
       </td>
     </tr>
     </tbody>
@@ -59,15 +60,6 @@ const invert = () => {
 </template>
 
 <style lang="scss" scoped>
-.btn {
-  background: #4d99ff;
-  border: solid 1px #4d99ff;
-  border-radius: 3px;
-  padding: 5px 16px;
-  cursor: pointer;
-  color: #fff;
-}
-
 table {
   border-spacing: 0;
   width: 100%;

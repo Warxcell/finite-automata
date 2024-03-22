@@ -5,6 +5,7 @@ import TabTitle from "@/components/TabTitle.vue";
 import {useFiniteAutomataStore} from "@/stores/finiteAutomataStore";
 import {storeToRefs} from "pinia";
 import {useRouteHash} from "@vueuse/router";
+import CustomButton from "@/components/CustomButton.vue";
 
 const itemsStore = useFiniteAutomataStore();
 
@@ -63,19 +64,19 @@ const share = () => {
   <div class="container">
     <h1 class="main-title">Симулация на крайни автомати</h1>
 
-    <button @click="share">{{ shareButtonText }}</button>
+    <CustomButton @click="share">{{ shareButtonText }}</CustomButton>
 
-    <div>
+    <div class="tabs-holder">
       <TabTitle v-for="(item, key) in items"
                 v-model:title="item.name"
                 :active="activeTab === key"
                 @click="activeTab = key"
                 @remove="remove(key)"/>
 
-      <button @click="add">+</button>
+      <CustomButton @click="add">+</CustomButton>
     </div>
 
-    <div v-for="(item, key) in items">
+    <div v-for="(item, key) in items" class="tab-content">
       <FiniteAutomata v-if="activeTab === key"
                       v-model:alphabet="item.alphabet"
                       v-model:final-states="item.finalStates"
@@ -91,7 +92,7 @@ const share = () => {
 </template>
 
 <style lang="scss" scoped>
-.container {
+.tab-content {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -101,4 +102,12 @@ const share = () => {
   flex: 0 0 100%;
   text-align: center;
 }
+
+.tabs-holder {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0;
+}
+
 </style>

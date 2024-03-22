@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {ref, unref} from "vue";
+import CustomButton from "@/components/CustomButton.vue";
 
 const props = defineProps<{
   states: string[]
@@ -58,7 +59,7 @@ const removeMapping = (sourceState: string, char: string) => {
             </select>
           </td>
           <td>
-            <button v-if="mapping[state]?.[char]" class="btn" @click="() => removeMapping(state, char)">X</button>
+            <CustomButton v-if="mapping[state]?.[char]" @click="() => removeMapping(state, char)">X</CustomButton>
           </td>
         </tr>
       </template>
@@ -68,15 +69,6 @@ const removeMapping = (sourceState: string, char: string) => {
 </template>
 
 <style lang="scss" scoped>
-.btn {
-  background: #4d99ff;
-  border: solid 1px #4d99ff;
-  border-radius: 3px;
-  padding: 5px 16px;
-  cursor: pointer;
-  color: #fff;
-}
-
 table {
   border-spacing: 0;
   width: 100%;
