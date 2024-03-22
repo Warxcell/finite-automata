@@ -8,12 +8,16 @@ export type RecognizesResult = {
     steps: RecognizedResultStep[]
 }
 
-export type RecognizedResultStep = {
-    sourceState: string
-    char: string
+export type RecognizedResultStep<State extends string, Alphabet extends string> = {
+    sourceState: State
+    char: Alphabet
     charIndex: number
-    targetState: string | undefined
+    targetState: State | undefined
 }
+
+export type IsCompleteResult<State extends string, Alphabet extends string> = {
+    isComplete: true
+} | { isComplete: false, missingTransitions: { sourceState: State, char: Alphabet } }
 
 export interface FiniteAutomata<State extends string, Alphabet extends string, InitialState extends State, FinalState extends State, Transition> {
 
@@ -27,9 +31,9 @@ export interface FiniteAutomata<State extends string, Alphabet extends string, I
 
     readonly transitions: Transition
 
-    isComplete(): boolean
+    isComplete(): IsCompleteResult<State, Alphabet>
 
-    recognizes(word: string): RecognizesResult
+    recognizes(word: string): RecognizesResult<State, Alphabet>
 }
 
 function includes<
@@ -68,15 +72,21 @@ export class DeterministicFiniteAutomata<State extends string, Alphabet extends 
         return this._finalStates;
     }
 
-    isComplete(): boolean {
+    isComplete(): IsCompleteResult {
+        const missingTransitions: { sourceState: State, char: Alphabet }[] = [];
+
         for (let i = 0; i < this._states.length; i++) {
             for (let c = 0; c < this._alphabet.length; c++) {
                 if (typeof this._map[this._states[i]]?.[this._alphabet[c]] === 'undefined') {
-                    return false;
+                    missingTransitions.push({sourceState: this._states[i], char: this._alphabet[c]})
                 }
             }
         }
-        return true;
+
+        return {
+            isComplete: missingTransitions.length === 0,
+            missingTransitions
+        }
     }
 
     recognizes(word: string): RecognizesResult {
@@ -196,7 +206,7 @@ export class NonDeterministicFiniteAutomata<State extends string, Alphabet exten
         return this.dfa;
     }
 
-    isComplete(): boolean {
+    isComplete(): IsCompleteResult {
         return this.dfa.isComplete();
     }
 

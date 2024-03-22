@@ -232,7 +232,26 @@ const nextStep = () => {
         <h2>Грешка при конструкцията на автомата: {{ fa.error }}</h2>
       </div>
       <div v-else>
-        <h2 class="is-diterm">Aвтомата <strong>{{ fa.isComplete() ? "Е" : "НЕ Е" }}</strong> напълно определен!</h2>
+        <h2 class="is-diterm">Aвтомата <strong>{{ fa.isComplete().isComplete ? "Е" : "НЕ Е" }}</strong> напълно
+          определен!</h2>
+
+        <table v-if="!fa.isComplete().isComplete">
+          <thead>
+          <tr>
+            <th colspan="2">Липсващи преходи</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(item) in fa.isComplete().missingTransitions">
+            <td>
+              {{ item.sourceState }}
+            </td>
+            <td>
+              {{ item.char }}
+            </td>
+          </tr>
+          </tbody>
+        </table>
 
         <Graph :alphabet="fa.alphabet"
                :finalStates="fa.finalStates"
