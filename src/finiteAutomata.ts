@@ -3,21 +3,21 @@ export enum FiniteAutomataType {
     NON_DETERMINISTIC
 }
 
-export type RecognizesResult<State extends string, Alphabet extends string> = {
+export type RecognizesResult<State extends string> = {
     recognized: boolean
-    steps: RecognizedResultStep<State, Alphabet>[]
+    steps: RecognizedResultStep<State>[]
 }
 
-export type RecognizedResultStep<State extends string, Alphabet extends string> = {
+export type RecognizedResultStep<State extends string> = {
     sourceState: State
-    char: Alphabet
+    char: string // this is string, because somebody could give us non-alphabet char
     charIndex: number
     targetState: State | undefined
 }
 
 export type IsCompleteResult<State extends string, Alphabet extends string> = {
     isComplete: boolean,
-    missingTransitions: { sourceState: State, char: Alphabet }
+    missingTransitions: { sourceState: State, char: Alphabet }[]
 }
 
 export interface FiniteAutomata<State extends string, Alphabet extends string, InitialState extends State, FinalState extends State, Transition> {
@@ -32,9 +32,9 @@ export interface FiniteAutomata<State extends string, Alphabet extends string, I
 
     readonly transitions: Transition
 
-    isComplete(): IsCompleteResult<State, Alphabet>
+    isComplete(): IsCompleteResult<any, any> // this is any, because Non-Deterministic one will create new states internally.
 
-    recognizes(word: string): RecognizesResult<State, Alphabet>
+    recognizes(word: string): RecognizesResult<any>
 }
 
 function includes<
@@ -90,10 +90,10 @@ export class DeterministicFiniteAutomata<State extends string, Alphabet extends 
         }
     }
 
-    recognizes(word: string): RecognizesResult<State, Alphabet> {
+    recognizes(word: string): RecognizesResult<State> {
         let state: State = this._initialState;
 
-        const steps: RecognizedResultStep<State, Alphabet>[] = [];
+        const steps: RecognizedResultStep<State>[] = [];
 
         for (let i = 0; i < word.length; i++) {
             const letter = word[i]
@@ -211,7 +211,7 @@ export class NonDeterministicFiniteAutomata<State extends string, Alphabet exten
         return this.dfa.isComplete();
     }
 
-    recognizes(word: string): RecognizesResult<string, string> {
+    recognizes(word: string): RecognizesResult<string> {
         return this.dfa.recognizes(word);
     }
 }
