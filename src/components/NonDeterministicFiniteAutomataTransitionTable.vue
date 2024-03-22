@@ -22,7 +22,7 @@ const addNewMapping = () => {
     return
   }
 
-  const newItem = [newSourceState.value, newChar.value, newTargetState.value];
+  const newItem: [string, string, string] = [newSourceState.value, newChar.value, newTargetState.value];
   if (mapping.value.find((item) => item[0] === newItem[0] && item[1] === newItem[1] && item[2] === newItem[2])) {
     error.value = 'Вече има такъв преход'
   } else {
