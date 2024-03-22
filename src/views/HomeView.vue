@@ -62,7 +62,9 @@ const share = () => {
 
 <template>
   <div class="container mx-auto">
-    <h1 class="main-title">Симулация на крайни автомати</h1>
+    <h1>
+      Симулация на крайни автомати
+    </h1>
 
     <button class="btn btn-info" @click="share">{{ shareButtonText }}</button>
 

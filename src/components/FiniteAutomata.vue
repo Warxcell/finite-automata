@@ -350,7 +350,7 @@ const nextStep = () => {
           </tbody>
         </table>
 
-        <input v-model="newWord" type="text" @change="addWord"/>
+        <input v-model="newWord" class="input input-bordered input-sm w-full max-w-xs" type="text" @change="addWord"/>
 
         <ClosableError v-if="wordError" :error="wordError" @close="wordError = ''"/>
       </div>
