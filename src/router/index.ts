@@ -9,14 +9,14 @@ const router = createRouter({
       name: 'home',
       component: HomeView
     },
-    {
-      path: '/ndfa-to-dfa',
-      name: 'ndfa-to-dfa',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/NdfaToDfa.vue')
-    }
+    // {
+    //   path: '/ndfa-to-dfa',
+    //   name: 'ndfa-to-dfa',
+    //   // route level code-splitting
+    //   // this generates a separate chunk (About.[hash].js) for this route
+    //   // which is lazy-loaded when the route is visited.
+    //   component: () => import('../views/NdfaToDfa.vue')
+    // }
   ]
 })
 
