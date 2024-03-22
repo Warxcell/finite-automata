@@ -32,7 +32,7 @@ export interface FiniteAutomata<State extends string, Alphabet extends string, I
 
     readonly transitions: Transition
 
-    isComplete(): IsCompleteResult<any, any> // this is any, because Non-Deterministic one will create new states internally.
+    isComplete(): IsCompleteResult<State, Alphabet>
 
     recognizes(word: string): RecognizesResult<any>
 }
@@ -207,8 +207,21 @@ export class NonDeterministicFiniteAutomata<State extends string, Alphabet exten
         return this.dfa;
     }
 
-    isComplete(): IsCompleteResult<string, string> {
-        return this.dfa.isComplete();
+    isComplete(): IsCompleteResult<State, Alphabet> {
+        const missingTransitions: { sourceState: State, char: Alphabet }[] = [];
+
+        for (let i = 0; i < this._states.length; i++) {
+            for (let c = 0; c < this._alphabet.length; c++) {
+                if (!this._map.find((item) => item[0] === this._states[i] && item[1] === this._alphabet[c])) {
+                    missingTransitions.push({sourceState: this._states[i], char: this._alphabet[c]})
+                }
+            }
+        }
+
+        return {
+            isComplete: missingTransitions.length === 0,
+            missingTransitions
+        }
     }
 
     recognizes(word: string): RecognizesResult<string> {
