@@ -125,7 +125,7 @@ const replay = (index: number | null) => {
   }
 }
 
-const transitionsBreadcrumbs = computed((): { label: string, highlight: boolean }[] => {
+const transitionsBreadcrumbs = computed((): { label: string, highlight: boolean, final: boolean }[] => {
   const statuses = unref(wordStatuses)
   const replayIndexValue = unref(replayIndex)
   if (replayIndexValue === null || !statuses || statuses?.[replayIndexValue].steps.length === 0) {
@@ -135,17 +135,21 @@ const transitionsBreadcrumbs = computed((): { label: string, highlight: boolean 
   const steps = statuses[replayIndexValue].steps
 
   const breadcrumbs = [];
-  breadcrumbs.push({label: steps[0].sourceState, highlight: charIndex.value === 0});
+  breadcrumbs.push({
+    label: steps[0].sourceState,
+    highlight: charIndex.value === 0,
+    final: finalStates.value.includes(steps[0].sourceState)
+  });
 
   for (let i = 0; i < steps.length; i++) {
     const item = steps[i]
-    breadcrumbs.push(({label: item.char, highlight: i === charIndex.value}))
+    breadcrumbs.push(({label: item.char, highlight: i === charIndex.value, final: false}))
 
     const highlight = i === charIndex.value || i + 1 === charIndex.value;
     if (item.targetState) {
-      breadcrumbs.push({label: item.targetState, highlight})
+      breadcrumbs.push({label: item.targetState, highlight, final: finalStates.value.includes(item.targetState)})
     } else {
-      breadcrumbs.push({label: 'Липсва преход', highlight})
+      breadcrumbs.push({label: 'Липсва преход', highlight, final: false})
     }
   }
 
@@ -304,7 +308,7 @@ const nextStep = () => {
 
         <div class="transitions-breadcrumbs">
             <span v-for="(item) in transitionsBreadcrumbs">
-              <span :class="{highlight: item.highlight}">{{ item.label }}</span>
+              <span :class="{highlight: item.highlight, final: item.final}">{{ item.label }}</span>
             </span>
         </div>
       </div>
@@ -340,6 +344,13 @@ const nextStep = () => {
 
     &.highlight {
       background-color: red;
+    }
+
+    &.final {
+      background-color: brown;
+      border: 5px solid yellow;
+      outline: 5px solid blue;
+      outline-offset: -20px;
     }
   }
 }
