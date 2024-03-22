@@ -129,41 +129,6 @@ const replay = (index: number | null) => {
   }
 }
 
-const transitionsBreadcrumbs = computed((): {
-  label: string,
-  highlight: boolean,
-  final: boolean
-}[] => {
-  const statuses = unref(wordStatuses)
-  const replayIndexValue = unref(replayIndex)
-  if (replayIndexValue === null || !statuses || statuses?.[replayIndexValue].steps.length === 0) {
-    return [];
-  }
-
-  const steps = statuses[replayIndexValue].steps
-
-  const breadcrumbs = [];
-  breadcrumbs.push({
-    label: steps[0].sourceState,
-    highlight: charIndex.value === 0,
-    final: finalStates.value.includes(steps[0].sourceState)
-  });
-
-  for (let i = 0; i < steps.length; i++) {
-    const item = steps[i]
-    breadcrumbs.push(({label: item.char, highlight: i === charIndex.value, final: false}))
-
-    const highlight = i === charIndex.value || i + 1 === charIndex.value;
-    if (item.targetState) {
-      breadcrumbs.push({label: item.targetState, highlight, final: finalStates.value.includes(item.targetState)})
-    } else {
-      breadcrumbs.push({label: 'Липсва преход', highlight, final: false})
-    }
-  }
-
-  return breadcrumbs;
-})
-
 const highlightStates = computed((): Record<string, string> | undefined => {
   if (replayIndex.value === null || typeof wordStatuses.value?.[replayIndex.value] === 'undefined') {
     return undefined;
@@ -246,8 +211,13 @@ const nextStep = () => {
 
   <div class="result-holder">
     <div class="setting-item">
-      <div v-if="'error' in fa" class="dfa-error">
-        <h2>Грешка при конструкцията на автомата: {{ fa.error }}</h2>
+      <div v-if="'error' in fa" class="alert alert-error" role="alert">
+        <svg class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"/>
+        </svg>
+        <span>Грешка при конструкцията на автомата: {{ fa.error }}</span>
       </div>
       <div v-else>
         <h2 class="is-diterm">Aвтомата <strong>{{ fa.isComplete().isComplete ? "Е" : "НЕ Е" }}</strong> напълно
@@ -309,21 +279,39 @@ const nextStep = () => {
     <div class="setting-item">
       <h2>Проверка на дума</h2>
 
-      <div v-if="replayIndex !== null" class="replay">
+      <div v-if="replayIndex !== null && wordStatuses?.[replayIndex]" class="replay">
         <button :disabled="charIndex === 0" class="btn btn-sm" @click="prevStep">Предна стъпка</button>
 
-        <span v-for="(char, i) in words[replayIndex]" :class="{current: charIndex === i}">{{ char }}</span>
+        <span v-for="(char, i) in words[replayIndex]" :class="{'underline': charIndex === i}">{{ char }}</span>
 
-        <button :disabled="wordStatuses?.[replayIndex].steps[charIndex+1] === undefined" class="btn btn-sm"
+        <button :disabled="wordStatuses[replayIndex].steps[charIndex+1] === undefined" class="btn btn-sm"
                 @click="nextStep">Следваща
           стъпка
         </button>
 
         <div class="text-sm breadcrumbs">
           <ul>
-            <li v-for="(item) in transitionsBreadcrumbs">
-              <span :class="{highlight: item.highlight, final: item.final}" class="rounded-full">{{ item.label }}</span>
+            <li>
+              <span :class="{'opacity-25': charIndex !== 0}" class="rounded-full border-2 p-2 border-double">
+                {{ initialState }}
+              </span>
             </li>
+            <template v-for="(item, index) in wordStatuses[replayIndex].steps">
+              <li>
+                <span :class="{'opacity-25': index !== charIndex}"
+                      class="rounded-full underline">
+                  {{ item.char }}
+                </span>
+              </li>
+              <li>
+                <span
+                    :class="[(wordStatuses[replayIndex].steps.length === index + 1 ? (item.targetState && finalStates.includes(item.targetState) ? 'border-green-400': 'border-red-400') : ''), {'opacity-25': !(index === charIndex || index + 1 === charIndex)}]"
+                    class=" rounded-full border-2 p-2"
+                >
+                  {{ item.targetState ?? 'Липсва преход' }}
+                </span>
+              </li>
+            </template>
           </ul>
         </div>
       </div>
@@ -371,27 +359,6 @@ const nextStep = () => {
 </template>
 
 <style lang="scss" scoped>
-.transitions-breadcrumbs {
-  span {
-    margin-right: 10px;
-
-    &.highlight {
-      background-color: red;
-    }
-
-    &.final {
-      background-color: brown;
-      border: 5px solid yellow;
-      outline: 5px solid blue;
-      outline-offset: -20px;
-    }
-  }
-}
-
-.dfa-error {
-  color: red;
-}
-
 strong {
   font-weight: bold;
 }
@@ -413,12 +380,6 @@ strong {
 
   .is-diterm {
     text-align: center;
-  }
-}
-
-.replay {
-  .current {
-    background-color: green;
   }
 }
 

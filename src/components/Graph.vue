@@ -26,9 +26,9 @@ onMounted(() => {
   }
   const graphvizObject = graphviz(graph.value, {
     width: 600,
-    height: 600
+    height: 600,
+    fit: true
   });
-
 
   const dot = computed(() => {
     const G = digraph(props.name, {rankdir: "LR"}, (g) => {
@@ -39,8 +39,9 @@ onMounted(() => {
 
       const nodes = states.value.map((state) => {
         return g.node(state, {
+          id: state,
           shape: finalStates.value.includes(state) ? 'doublecircle' : 'circle',
-          color: highlightStates.value?.[state] ?? 'black'
+          color: highlightStates.value?.[state] ?? 'black',
         });
       })
 
@@ -62,6 +63,7 @@ onMounted(() => {
             return
           }
           g.edge([node1, node2], {
+            id: `${node1.id}-${item[1]}-${node2.id}`,
             label: item[1],
             color: highlighTransitionUnref?.find((highlightTransition) => {
               return highlightTransition?.[0] === item[0] && highlightTransition?.[1] == item[1] && highlightTransition?.[2] == item[2];
@@ -78,11 +80,14 @@ onMounted(() => {
             if (!node1 || !node2) {
               return
             }
+            const color = highlighTransitionUnref?.find((highlightTransition) => {
+              return highlightTransition?.[0] === item[0] && highlightTransition?.[1] == item2[0] && highlightTransition?.[2] == item2[1];
+            })?.[3] ?? 'black';
             g.edge([node1, node2], {
+              id: `${node1.id}-${item2[0]}-${node2.id}`,
               label: item2[0],
-              color: highlighTransitionUnref?.find((highlightTransition) => {
-                return highlightTransition?.[0] === item[0] && highlightTransition?.[1] == item2[0] && highlightTransition?.[2] == item2[1];
-              })?.[3] ?? 'black'
+              fillcolor: color,
+              color: color,
             });
           })
         })
