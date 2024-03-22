@@ -3,9 +3,9 @@ export enum FiniteAutomataType {
     NON_DETERMINISTIC
 }
 
-export type RecognizesResult = {
+export type RecognizesResult<State extends string, Alphabet extends string> = {
     recognized: boolean
-    steps: RecognizedResultStep[]
+    steps: RecognizedResultStep<State, Alphabet>[]
 }
 
 export type RecognizedResultStep<State extends string, Alphabet extends string> = {
@@ -16,8 +16,9 @@ export type RecognizedResultStep<State extends string, Alphabet extends string> 
 }
 
 export type IsCompleteResult<State extends string, Alphabet extends string> = {
-    isComplete: true
-} | { isComplete: false, missingTransitions: { sourceState: State, char: Alphabet } }
+    isComplete: boolean,
+    missingTransitions: { sourceState: State, char: Alphabet }
+}
 
 export interface FiniteAutomata<State extends string, Alphabet extends string, InitialState extends State, FinalState extends State, Transition> {
 
@@ -72,7 +73,7 @@ export class DeterministicFiniteAutomata<State extends string, Alphabet extends 
         return this._finalStates;
     }
 
-    isComplete(): IsCompleteResult {
+    isComplete(): IsCompleteResult<State, Alphabet> {
         const missingTransitions: { sourceState: State, char: Alphabet }[] = [];
 
         for (let i = 0; i < this._states.length; i++) {
@@ -89,10 +90,10 @@ export class DeterministicFiniteAutomata<State extends string, Alphabet extends 
         }
     }
 
-    recognizes(word: string): RecognizesResult {
+    recognizes(word: string): RecognizesResult<State, Alphabet> {
         let state: State = this._initialState;
 
-        const steps: RecognizedResultStep[] = [];
+        const steps: RecognizedResultStep<State, Alphabet>[] = [];
 
         for (let i = 0; i < word.length; i++) {
             const letter = word[i]
@@ -206,11 +207,11 @@ export class NonDeterministicFiniteAutomata<State extends string, Alphabet exten
         return this.dfa;
     }
 
-    isComplete(): IsCompleteResult {
+    isComplete(): IsCompleteResult<string, string> {
         return this.dfa.isComplete();
     }
 
-    recognizes(word: string): RecognizesResult {
+    recognizes(word: string): RecognizesResult<string, string> {
         return this.dfa.recognizes(word);
     }
 }
