@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {ref, watch} from "vue";
+import {ref} from "vue";
 import FiniteAutomata from "@/components/FiniteAutomata.vue";
 import TabTitle from "@/components/TabTitle.vue";
 import {useFiniteAutomataStore} from "@/stores/finiteAutomataStore";
