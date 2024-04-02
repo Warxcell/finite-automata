@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {nextTick, ref, watch} from "vue";
+import {computed, nextTick, ref, watch} from "vue";
 
 
 const element = ref<HTMLDivElement | null>(null);
@@ -9,35 +9,36 @@ defineProps<{
   active: boolean
 }>()
 
-const edit = ref(false);
+const edit = ref(false)
 
-watch(edit, (newEdit) => {
+const editable = computed(() => {
+  return edit.value || title.value === ''
+})
+
+watch(editable, (newEdit) => {
   if (newEdit) {
     nextTick(() => {
       element.value?.focus()
     })
   }
+}, {
+  immediate: true
 })
 
 defineEmits<{
   click: []
   remove: []
 }>()
-
-watch(title, (newTitle) => {
-  if (newTitle === '') {
-    edit.value = true;
-  }
-})
 </script>
 
 <template>
   <div :class="{'tab-active': active}" class="tab" @click="$emit('click')">
     <input
-        v-if="edit"
+        v-if="editable"
         ref="element"
-        v-model="title"
+        v-model.lazy="title"
         class="prevent-select"
+        placeholder="Tab"
         type="text"
         @change="edit = false"
         @focusout="edit = false"
