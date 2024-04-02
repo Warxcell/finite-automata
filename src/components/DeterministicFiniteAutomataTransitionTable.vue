@@ -50,7 +50,7 @@ const removeMapping = (sourceState: string, char: string) => {
               {{ mapping[state]?.[char] }}
               </span>
 
-            <select v-else v-model="newMappingTargetState" class="select select-bordered select-sm w-full max-w-xs"
+            <select v-else v-model="newMappingTargetState" class="select select-info select-sm w-full max-w-xs"
                     @change="() => addNewMapping(state, char)">
               <option></option>
               <option v-for="state in states">
@@ -59,9 +59,8 @@ const removeMapping = (sourceState: string, char: string) => {
             </select>
           </td>
           <td>
-            <button v-if="mapping[state]?.[char]" class="btn btn-sm btn-error"
-                    @click="() => removeMapping(state, char)">
-              X
+            <button v-if="mapping[state]?.[char]" class="btn btn-sm btn-square btn-error" @click="() => removeMapping(state, char)">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
           </td>
         </tr>

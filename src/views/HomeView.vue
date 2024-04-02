@@ -62,11 +62,11 @@ const share = () => {
 
 <template>
   <div class="container mx-auto">
-    <h1>
+    <h1 class="text-center mb-3 text-3xl">
       Симулация на крайни автомати
     </h1>
 
-    <button class="btn btn-info" @click="share">{{ shareButtonText }}</button>
+    <button class="btn btn-info mb-3" @click="share">{{ shareButtonText }}</button>
 
     <div class="tabs tabs-lifted" role="tablist">
       <template v-for="(item, key) in items">
@@ -76,7 +76,7 @@ const share = () => {
             @click="activeTab = key"
             @remove="remove(key)"/>
 
-        <div v-if="activeTab === key" class="tab-content p-10" role="tabpanel">
+        <div v-if="activeTab === key" class="tab-content border-base-300 rounded-box p-6" role="tabpanel">
           <FiniteAutomata
               v-model:alphabet="item.alphabet"
               v-model:final-states="item.finalStates"
@@ -101,4 +101,15 @@ const share = () => {
 
 <style lang="scss" scoped>
 
+.tabs-boxed {
+  border-radius: var(--rounded-btn, 0.5rem);
+  --tw-bg-opacity: transparent;
+  background-color: transparent;
+  padding: 0;
+}
+.tab-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
 </style>

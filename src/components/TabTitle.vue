@@ -48,6 +48,19 @@ defineEmits<{
 </template>
 
 <style lang="scss" scoped>
+.tab {
+  flex-wrap: nowrap;
+}
+
+.btn-xs {
+  height: 1rem;
+  min-height: 1rem;
+  padding-left: 0.3rem;
+  padding-right: 0.3rem;
+  font-size: 1em;
+  line-height: 0.5em;
+}
+
 .prevent-select {
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */

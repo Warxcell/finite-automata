@@ -177,27 +177,27 @@ const nextStep = () => {
 
 <template>
   <div class="states setting-item">
-    <h2>Състояния</h2>
+    <h2 class="mx-auto text-2xl">Състояния</h2>
 
     <States v-model:final-states="finalStates" v-model:initial-state="initialState" v-model:states="states"/>
   </div>
 
   <div class="alphabet setting-item">
-    <h2>Азбука</h2>
+    <h2 class="mx-auto text-2xl">Азбука</h2>
     <Alphabet v-model="alphabet"/>
   </div>
 
 
   <div class="setting-item">
-    <h2>Функция на състоянията</h2>
+    <h2 class="mx-auto text-2xl">Функция на състоянията</h2>
     <div>
-      <label>
-        <input v-model="type" :value="FiniteAutomataType.DETERMINISTIC" type="radio"/>
-        Детерминиран
+      <label class="label cursor-pointer">
+        <span class="label-text">Детерминиран</span>
+        <input v-model="type" :value="FiniteAutomataType.DETERMINISTIC" type="radio" class="radio radio-info"/>
       </label>
-      <label>
-        <input v-model="type" :value="FiniteAutomataType.NON_DETERMINISTIC" type="radio"/>
-        Недетерминиран
+      <label class="label cursor-pointer">
+        <span class="label-text">Недетерминиран</span>
+        <input v-model="type" :value="FiniteAutomataType.NON_DETERMINISTIC" type="radio" class="radio radio-info"/>
       </label>
     </div>
 
@@ -210,6 +210,101 @@ const nextStep = () => {
   </div>
 
   <div class="result-holder">
+    <div class="setting-item">
+      <h2 class="mx-auto text-2xl">Проверка на дума</h2>
+
+      <div v-if="replayIndex !== null && wordStatuses?.[replayIndex]" class="replay flex gap-2 flex-wrap">
+        <button :disabled="charIndex === 0" class="btn btn-outline btn-info btn-sm gap-2" @click="prevStep">
+          <svg class="h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+            <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"></path>
+          </svg>
+          <span class="flex flex-col items-start">
+            <span class="text-base-content/70 hidden text-xs md:block">предишна</span>
+            <span>стъпка</span>
+          </span>
+        </button>
+
+        <span v-for="(char, i) in words[replayIndex]" :class="{'underline': charIndex === i}">{{ char }}</span>
+
+        <button :disabled="wordStatuses[replayIndex].steps[charIndex+1] === undefined"class="btn btn-outline btn-info btn-sm 4"
+                @click="nextStep">
+          <span class="flex flex-col items-end">
+            <span class="text-base-content/70 hidden text-xs md:block">следваща</span>
+            <span>стъпка</span>
+          </span>
+          <svg class="h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+            <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"></path>
+          </svg>
+        </button>
+
+        <div class="text-sm breadcrumbs w-full">
+          <ul>
+            <li>
+              <span :class="{'opacity-25': charIndex !== 0}" class="border-double text-center border-sky-600 border-4 rounded-full py-1 px-2">
+                {{ initialState }}
+              </span>
+            </li>
+            <template v-for="(item, index) in wordStatuses[replayIndex].steps">
+              <li>
+                <span :class="{'opacity-25': index !== charIndex}"
+                      class="rounded-full underline">
+                  {{ item.char }}
+                </span>
+              </li>
+              <li>
+                <span
+                    :class="[(wordStatuses[replayIndex].steps.length === index + 1 ? (item.targetState && finalStates.includes(item.targetState) ? 'border-green-400': 'border-red-400') : 'border-neutral-600'), {'opacity-25': !(index === charIndex || index + 1 === charIndex)}]"
+                    class="text-center rounded-full border-2 py-1 px-2"
+                >
+                  {{ item.targetState ?? 'Липсва преход' }}
+                </span>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </div>
+
+      <div class="words">
+        <table class="table table-xs table-auto">
+          <thead>
+          <tr>
+            <th>Дума</th>
+            <th>Разпознава ли се?</th>
+            <th>
+              <div class="tooltip" data-tip="Проследи автомата с тази дума стъпка по стъпка">
+                Проследи
+              </div>
+            </th>
+            <th>Изтрий</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(word, i) in words" class="hover">
+            <td><input placeholder="въведи дума" class="input input-bordered input-xs input-info w-full max-w-xs" v-model="words[i]" type="text"/></td>
+            <td>
+                <span v-if="wordStatuses" :class="{ok: wordStatuses[i].recognized}" class="status">
+                    {{ wordStatuses[i].recognized ? "ДА" : "НЕ" }}
+                </span>
+            </td>
+            <td>
+              <button v-if="replayIndex !== i" class="btn btn-info btn-sm btn-outline" @click="replay(i)">Проследи
+              </button>
+              <button v-else class="btn btn-sm btn-outline btn-error" @click="replay(null)">Спри</button>
+            </td>
+            <td>
+              <button class="btn btn-error btn-square btn-sm" @click="() => removeWord(word)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <input v-model="newWord" placeholder="въведи дума" class="input input-bordered input-sm input-info w-full" type="text" @change="addWord"/>
+
+      <ClosableError v-if="wordError" :error="wordError" @close="wordError = ''"/>
+    </div>
     <div class="setting-item">
       <div v-if="'error' in fa" class="alert alert-error" role="alert">
         <svg class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -275,86 +370,6 @@ const nextStep = () => {
         </template>
       </div>
     </div>
-
-    <div class="setting-item">
-      <h2>Проверка на дума</h2>
-
-      <div v-if="replayIndex !== null && wordStatuses?.[replayIndex]" class="replay">
-        <button :disabled="charIndex === 0" class="btn btn-sm" @click="prevStep">Предна стъпка</button>
-
-        <span v-for="(char, i) in words[replayIndex]" :class="{'underline': charIndex === i}">{{ char }}</span>
-
-        <button :disabled="wordStatuses[replayIndex].steps[charIndex+1] === undefined" class="btn btn-sm"
-                @click="nextStep">Следваща
-          стъпка
-        </button>
-
-        <div class="text-sm breadcrumbs">
-          <ul>
-            <li>
-              <span :class="{'opacity-25': charIndex !== 0}" class="rounded-full border-2 p-2 border-double">
-                {{ initialState }}
-              </span>
-            </li>
-            <template v-for="(item, index) in wordStatuses[replayIndex].steps">
-              <li>
-                <span :class="{'opacity-25': index !== charIndex}"
-                      class="rounded-full underline">
-                  {{ item.char }}
-                </span>
-              </li>
-              <li>
-                <span
-                    :class="[(wordStatuses[replayIndex].steps.length === index + 1 ? (item.targetState && finalStates.includes(item.targetState) ? 'border-green-400': 'border-red-400') : ''), {'opacity-25': !(index === charIndex || index + 1 === charIndex)}]"
-                    class=" rounded-full border-2 p-2"
-                >
-                  {{ item.targetState ?? 'Липсва преход' }}
-                </span>
-              </li>
-            </template>
-          </ul>
-        </div>
-      </div>
-
-      <div class="words">
-        <table class="table table-xs table-auto">
-          <thead>
-          <tr>
-            <th>Дума</th>
-            <th>Разпознава?</th>
-            <th>
-              <div class="tooltip" data-tip="Проследи автомата с тази дума стъпка по стъпка">
-                Проследи
-              </div>
-            </th>
-            <th>Изтрий</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr v-for="(word, i) in words" class="hover">
-            <td><input v-model="words[i]" type="text"/></td>
-            <td>
-                <span v-if="wordStatuses" :class="{ok: wordStatuses[i].recognized}" class="status">
-                    {{ wordStatuses[i].recognized ? "ДА" : "НЕ" }}
-                </span>
-            </td>
-            <td>
-              <button v-if="replayIndex !== i" class="btn btn-info btn-sm btn-outline" @click="replay(i)">Проследи
-              </button>
-              <button v-else class="btn btn-sm btn-outline btn-info" @click="replay(null)">Спри</button>
-            </td>
-            <td>
-              <button class="btn btn-error btn-sm" @click="() => removeWord(word)">X</button>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-
-        <input v-model="newWord" class="input input-bordered input-sm w-full max-w-xs" type="text" @change="addWord"/>
-
-        <ClosableError v-if="wordError" :error="wordError" @close="wordError = ''"/>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -375,6 +390,7 @@ strong {
 
 .result-holder {
   flex: 0 0 100%;
+  flex-wrap: wrap;
   display: flex;
   gap: 10px;
 
