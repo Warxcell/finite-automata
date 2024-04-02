@@ -194,11 +194,15 @@ const addNewMapping = (sourceState: string, char: string) => {
     <div class="setting-item">
       <h2 class="mx-auto text-2xl">Проверка на дума</h2>
 
-      <div v-if="replayIndex !== null && wordStatuses?.[replayIndex]">
+      <div v-if="replayIndex && wordStatuses?.[replayIndex] && initialState">
         <button class="btn btn-sm btn-outline btn-error" @click="replay(null)">Спри</button>
 
-        <WordReplay v-model:char-index="charIndex" :finalStates
-                    :initialState :status="wordStatuses[replayIndex]" :word="words[replayIndex]"/>
+        <WordReplay v-model:char-index="charIndex"
+                    :finalStates
+                    :initialState
+                    :status="wordStatuses[replayIndex]"
+                    :word="words[replayIndex]"
+        />
       </div>
 
       <div v-else class="words">

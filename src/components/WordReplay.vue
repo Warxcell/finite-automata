@@ -34,7 +34,12 @@ const nextStep = () => {
           </span>
     </button>
 
-    <span v-for="(char, i) in word" :class="{'underline': charIndex === i}">{{ char }}</span>
+    <span v-for="(char, i) in word"
+          :class="{'underline': charIndex === i}"
+          class="cursor-pointer"
+          @click="charIndex = i">
+      {{ char }}
+    </span>
 
     <button :disabled="status.steps[charIndex + 1] === undefined"
             class="btn btn-outline btn-info btn-sm 4"
