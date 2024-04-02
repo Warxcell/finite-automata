@@ -78,8 +78,8 @@ export class DeterministicFiniteAutomata<State extends string, Alphabet extends 
 
         for (let i = 0; i < this._states.length; i++) {
             for (let c = 0; c < this._alphabet.length; c++) {
-                if (typeof this._map[this._states[i]]?.[this._alphabet[c]] === 'undefined') {
-                    missingTransitions.push({sourceState: this._states[i], char: this._alphabet[c]})
+                if (typeof this._map[this._states[i]!]?.[this._alphabet[c]!] === 'undefined') {
+                    missingTransitions.push({sourceState: this._states[i]!, char: this._alphabet[c]!})
                 }
             }
         }
@@ -96,7 +96,7 @@ export class DeterministicFiniteAutomata<State extends string, Alphabet extends 
         const steps: RecognizedResultStep<State>[] = [];
 
         for (let i = 0; i < word.length; i++) {
-            const letter = word[i]
+            const letter = word[i]!
             const nextState = this._map?.[state]?.[letter as Alphabet];
 
             steps.push({
@@ -151,12 +151,12 @@ export class NonDeterministicFiniteAutomata<State extends string, Alphabet exten
             }
 
             for (let i = 0; i < _alphabet.length; i++) {
-                const char = _alphabet[i];
+                const char = _alphabet[i]!;
 
                 const newTargetStateArray: State[] = [];
 
                 for (let j = 0; j < _map.length; j++) {
-                    const map = _map[j];
+                    const map = _map[j]!;
 
                     if (states.includes(map[0]) && map[1] === char && !newTargetStateArray.includes(map[2])) {
                         newTargetStateArray.push(map[2]);
@@ -213,7 +213,7 @@ export class NonDeterministicFiniteAutomata<State extends string, Alphabet exten
         for (let i = 0; i < this._states.length; i++) {
             for (let c = 0; c < this._alphabet.length; c++) {
                 if (!this._map.find((item) => item[0] === this._states[i] && item[1] === this._alphabet[c])) {
-                    missingTransitions.push({sourceState: this._states[i], char: this._alphabet[c]})
+                    missingTransitions.push({sourceState: this._states[i]!, char: this._alphabet[c]!})
                 }
             }
         }

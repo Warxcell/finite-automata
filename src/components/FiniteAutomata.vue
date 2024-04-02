@@ -107,13 +107,13 @@ const wordStatuses = computed(() => {
   return words.value.map((word) => dfaUnref.recognizes(word));
 })
 
-const charIndex = ref<number>(0)
+const stepIndex = ref<number>(0)
 
 const replayIndex = ref<number | null>(null)
 
 const replay = (index: number | null) => {
   replayIndex.value = index
-  charIndex.value = 0
+  stepIndex.value = 0
 }
 
 const highlightStates = computed((): Record<string, string> | undefined => {
@@ -121,7 +121,10 @@ const highlightStates = computed((): Record<string, string> | undefined => {
     return undefined;
   }
 
-  const step = wordStatuses.value[replayIndex.value].steps[charIndex.value];
+  const step = wordStatuses.value[replayIndex.value]?.steps[stepIndex.value];
+  if (!step) {
+    return undefined
+  }
 
   const r = {
     [step.sourceState]: 'red',
@@ -138,9 +141,8 @@ const highlightTransitions = computed((): [string, string, string, string][] | u
     return undefined;
   }
 
-  const steps = wordStatuses.value[replayIndex.value].steps;
-  const status = steps[charIndex.value];
-  if (status.targetState) {
+  const status = wordStatuses.value[replayIndex.value]?.steps[stepIndex.value];
+  if (status?.targetState) {
     return [[status.sourceState, status.char, status.targetState, 'red']]
   } else {
     return undefined;
@@ -197,11 +199,11 @@ const addNewMapping = (sourceState: string, char: string) => {
       <div v-if="replayIndex && wordStatuses?.[replayIndex] && initialState">
         <button class="btn btn-sm btn-outline btn-error" @click="replay(null)">Спри</button>
 
-        <WordReplay v-model:char-index="charIndex"
+        <WordReplay v-model:char-index="stepIndex"
                     :finalStates
                     :initialState
-                    :status="wordStatuses[replayIndex]"
-                    :word="words[replayIndex]"
+                    :status="wordStatuses[replayIndex]!"
+                    :word="words[replayIndex]!"
         />
       </div>
 
@@ -224,8 +226,8 @@ const addNewMapping = (sourceState: string, char: string) => {
             <td><input v-model="words[i]" class="input input-bordered input-xs input-info w-full max-w-xs"
                        placeholder="въведи дума" type="text"/></td>
             <td>
-                <span v-if="wordStatuses" :class="{ok: wordStatuses[i].recognized}" class="status">
-                    {{ wordStatuses[i].recognized ? "ДА" : "НЕ" }}
+                <span v-if="wordStatuses?.[i]" :class="{ok: wordStatuses[i]!.recognized}" class="status">
+                    {{ wordStatuses[i]!.recognized ? "ДА" : "НЕ" }}
                 </span>
             </td>
             <td>
