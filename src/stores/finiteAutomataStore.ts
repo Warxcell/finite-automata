@@ -49,7 +49,16 @@ export const useFiniteAutomataStore = defineStore('finite_automata_store', () =>
         FiniteAutomataStoreItem[]>([{...exampleItem}])
 
     function add() {
-        items.value.push({...exampleItem})
+        items.value.push({
+            name: '',
+            states: [],
+            alphabet: [],
+            initialState: undefined,
+            finalStates: [],
+            type: FiniteAutomataType.DETERMINISTIC,
+            transitions: [],
+            words: []
+        })
     }
 
     function remove(index: number) {

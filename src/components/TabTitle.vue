@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {ref, watch} from "vue";
+import {nextTick, ref, watch} from "vue";
 
 
 const element = ref<HTMLDivElement | null>(null);
@@ -13,33 +13,41 @@ const edit = ref(false);
 
 watch(edit, (newEdit) => {
   if (newEdit) {
-    element.value?.focus()
+    nextTick(() => {
+      element.value?.focus()
+    })
   }
 })
-
-const input = () => {
-  title.value = element.value?.textContent ?? ''
-}
 
 defineEmits<{
   click: []
   remove: []
 }>()
 
+watch(title, (newTitle) => {
+  if (newTitle === '') {
+    edit.value = true;
+  }
+})
 </script>
 
 <template>
-  <div :class="{'tab-active': active}" class="tab">
-    <div ref="element"
-         :contenteditable="edit"
+  <div :class="{'tab-active': active}" class="tab" @click="$emit('click')">
+    <input
+        v-if="edit"
+        ref="element"
+        v-model="title"
+        class="prevent-select"
+        type="text"
+        @change="edit = false"
+        @focusout="edit = false"
+    />
+    <div v-else
          class="prevent-select"
-         @click="$emit('click')"
          @dblclick="edit = true"
-         @focusout="edit = false"
-         @input="input"
-         v-text="title"
-         @keydown.enter.stop.prevent
-         @keyup.enter.stop.prevent="edit = false"></div>
+    >
+      {{ title }}
+    </div>
 
     <div class="tooltip" data-tip="Изтрий автомата">
       <button class="btn btn-outline btn-error btn-xs rounded" @click="$emit('remove')">-</button>

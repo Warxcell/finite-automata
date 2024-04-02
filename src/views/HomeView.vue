@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import FiniteAutomata from "@/components/FiniteAutomata.vue";
 import TabTitle from "@/components/TabTitle.vue";
 import {useFiniteAutomataStore} from "@/stores/finiteAutomataStore";
@@ -30,17 +30,22 @@ const hash = useRouteHash()
 if (hash.value) {
   // const parsed = typia.json.assertParse<typeof items>(hash.value.substring(1));
   items.value = JSON.parse(hash.value.substring(1));
-  hash.value = ''
 }
-
 
 const shareButtonTextOG = 'Сподели'
 const shareButtonText = ref(shareButtonTextOG)
-const share = () => {
-  // hash.value = `#${typia.json.stringify(items.value)}`
-  hash.value = `#${JSON.stringify(items.value)}`
 
+watch(items, (newItems) => {
+  // hash.value = `#${typia.json.stringify(items.value)}`
+  hash.value = `#${JSON.stringify(newItems)}`
+}, {
+  immediate: !hash.value,
+  deep: true
+})
+
+const share = () => {
   const url = `${window.location.origin}${window.location.pathname}${hash.value}`
+
   navigator.share({
     url: url
   })
@@ -107,6 +112,7 @@ const share = () => {
   background-color: transparent;
   padding: 0;
 }
+
 .tab-content {
   display: flex;
   flex-wrap: wrap;

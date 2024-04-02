@@ -9,14 +9,13 @@ import {
 import Graph from "@/components/Graph.vue";
 import States from "@/components/States.vue";
 import Alphabet from "@/components/Alphabet.vue";
-import type {WatchStopHandle} from "@vue/runtime-core";
 import DeterministicFiniteAutomataTransitionTable from "@/components/DeterministicFiniteAutomataTransitionTable.vue";
 import NonDeterministicFiniteAutomataTransitionTable
   from "@/components/NonDeterministicFiniteAutomataTransitionTable.vue";
 import {useItems} from "@/composables/useItems";
 import {assertNever} from "@/helper";
 import ClosableError from "@/components/ClosableError.vue";
-
+import WordReplay from "@/components/WordReplay.vue";
 
 defineProps<{
   name: string
@@ -112,21 +111,9 @@ const charIndex = ref<number>(0)
 
 const replayIndex = ref<number | null>(null)
 
-let wordWatcher: WatchStopHandle | null = null;
 const replay = (index: number | null) => {
   replayIndex.value = index
-  charIndex.value = 0;
-
-  if (wordWatcher) {
-    wordWatcher();
-  }
-
-  if (index !== null) {
-    wordWatcher = watch(() => words.value[index], () => {
-      replayIndex.value = index
-      charIndex.value = 0;
-    });
-  }
+  charIndex.value = 0
 }
 
 const highlightStates = computed((): Record<string, string> | undefined => {
@@ -167,12 +154,6 @@ const addNewMapping = (sourceState: string, char: string) => {
   newMappingTargetState.value = ''
 }
 
-const prevStep = () => {
-  charIndex.value--;
-}
-const nextStep = () => {
-  charIndex.value++;
-}
 </script>
 
 <template>
@@ -193,11 +174,11 @@ const nextStep = () => {
     <div>
       <label class="label cursor-pointer">
         <span class="label-text">Детерминиран</span>
-        <input v-model="type" :value="FiniteAutomataType.DETERMINISTIC" type="radio" class="radio radio-info"/>
+        <input v-model="type" :value="FiniteAutomataType.DETERMINISTIC" class="radio radio-info" type="radio"/>
       </label>
       <label class="label cursor-pointer">
         <span class="label-text">Недетерминиран</span>
-        <input v-model="type" :value="FiniteAutomataType.NON_DETERMINISTIC" type="radio" class="radio radio-info"/>
+        <input v-model="type" :value="FiniteAutomataType.NON_DETERMINISTIC" class="radio radio-info" type="radio"/>
       </label>
     </div>
 
@@ -213,58 +194,14 @@ const nextStep = () => {
     <div class="setting-item">
       <h2 class="mx-auto text-2xl">Проверка на дума</h2>
 
-      <div v-if="replayIndex !== null && wordStatuses?.[replayIndex]" class="replay flex gap-2 flex-wrap">
-        <button :disabled="charIndex === 0" class="btn btn-outline btn-info btn-sm gap-2" @click="prevStep">
-          <svg class="h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
-            <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"></path>
-          </svg>
-          <span class="flex flex-col items-start">
-            <span class="text-base-content/70 hidden text-xs md:block">предишна</span>
-            <span>стъпка</span>
-          </span>
-        </button>
+      <div v-if="replayIndex !== null && wordStatuses?.[replayIndex]">
+        <button class="btn btn-sm btn-outline btn-error" @click="replay(null)">Спри</button>
 
-        <span v-for="(char, i) in words[replayIndex]" :class="{'underline': charIndex === i}">{{ char }}</span>
-
-        <button :disabled="wordStatuses[replayIndex].steps[charIndex+1] === undefined"class="btn btn-outline btn-info btn-sm 4"
-                @click="nextStep">
-          <span class="flex flex-col items-end">
-            <span class="text-base-content/70 hidden text-xs md:block">следваща</span>
-            <span>стъпка</span>
-          </span>
-          <svg class="h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
-            <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"></path>
-          </svg>
-        </button>
-
-        <div class="text-sm breadcrumbs w-full">
-          <ul>
-            <li>
-              <span :class="{'opacity-25': charIndex !== 0}" class="border-double text-center border-sky-600 border-4 rounded-full py-1 px-2">
-                {{ initialState }}
-              </span>
-            </li>
-            <template v-for="(item, index) in wordStatuses[replayIndex].steps">
-              <li>
-                <span :class="{'opacity-25': index !== charIndex}"
-                      class="rounded-full underline">
-                  {{ item.char }}
-                </span>
-              </li>
-              <li>
-                <span
-                    :class="[(wordStatuses[replayIndex].steps.length === index + 1 ? (item.targetState && finalStates.includes(item.targetState) ? 'border-green-400': 'border-red-400') : 'border-neutral-600'), {'opacity-25': !(index === charIndex || index + 1 === charIndex)}]"
-                    class="text-center rounded-full border-2 py-1 px-2"
-                >
-                  {{ item.targetState ?? 'Липсва преход' }}
-                </span>
-              </li>
-            </template>
-          </ul>
-        </div>
+        <WordReplay v-model:char-index="charIndex" :finalStates
+                    :initialState :status="wordStatuses[replayIndex]" :word="words[replayIndex]"/>
       </div>
 
-      <div class="words">
+      <div v-else class="words">
         <table class="table table-xs table-auto">
           <thead>
           <tr>
@@ -280,31 +217,37 @@ const nextStep = () => {
           </thead>
           <tbody>
           <tr v-for="(word, i) in words" class="hover">
-            <td><input placeholder="въведи дума" class="input input-bordered input-xs input-info w-full max-w-xs" v-model="words[i]" type="text"/></td>
+            <td><input v-model="words[i]" class="input input-bordered input-xs input-info w-full max-w-xs"
+                       placeholder="въведи дума" type="text"/></td>
             <td>
                 <span v-if="wordStatuses" :class="{ok: wordStatuses[i].recognized}" class="status">
                     {{ wordStatuses[i].recognized ? "ДА" : "НЕ" }}
                 </span>
             </td>
             <td>
-              <button v-if="replayIndex !== i" class="btn btn-info btn-sm btn-outline" @click="replay(i)">Проследи
+              <button class="btn btn-info btn-sm btn-outline" @click="replay(i)">
+                Проследи
               </button>
-              <button v-else class="btn btn-sm btn-outline btn-error" @click="replay(null)">Спри</button>
             </td>
             <td>
               <button class="btn btn-error btn-square btn-sm" @click="() => removeWord(word)">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                     xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                </svg>
               </button>
             </td>
           </tr>
           </tbody>
         </table>
+
+        <input v-model="newWord" class="input input-bordered input-sm input-info w-full" placeholder="въведи дума"
+               type="text" @change="addWord"/>
+
+        <ClosableError v-if="wordError" :error="wordError" @close="wordError = ''"/>
       </div>
-
-      <input v-model="newWord" placeholder="въведи дума" class="input input-bordered input-sm input-info w-full" type="text" @change="addWord"/>
-
-      <ClosableError v-if="wordError" :error="wordError" @close="wordError = ''"/>
     </div>
+
     <div class="setting-item">
       <div v-if="'error' in fa" class="alert alert-error" role="alert">
         <svg class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -315,7 +258,9 @@ const nextStep = () => {
         <span>Грешка при конструкцията на автомата: {{ fa.error }}</span>
       </div>
       <div v-else>
-        <h2 class="is-diterm">Aвтомата <strong>{{ fa.isComplete().isComplete ? "Е" : "НЕ Е" }}</strong> напълно
+        <h2 class="is-diterm">Aвтомата <strong class="font-bold">{{
+            fa.isComplete().isComplete ? "Е" : "НЕ Е"
+          }}</strong> напълно
           определен!</h2>
 
         <table v-if="!fa.isComplete().isComplete" class="table table-xs">
@@ -374,10 +319,6 @@ const nextStep = () => {
 </template>
 
 <style lang="scss" scoped>
-strong {
-  font-weight: bold;
-}
-
 .setting-item {
   border: solid 1px #333;
   padding: 10px;
