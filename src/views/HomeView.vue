@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import {ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import FiniteAutomata from "@/components/FiniteAutomata.vue";
 import TabTitle from "@/components/TabTitle.vue";
 import {useFiniteAutomataStore} from "@/stores/finiteAutomataStore";
 import {storeToRefs} from "pinia";
 import {useRouteHash} from "@vueuse/router";
+import CopyToClipboardButton from "@/components/CopyToClipboardButton.vue";
 
 const itemsStore = useFiniteAutomataStore();
 
@@ -43,25 +44,12 @@ watch(items, (newItems) => {
   deep: true
 })
 
+const url = computed(() => `${window.location.origin}${window.location.pathname}${hash.value}`)
+
 const share = () => {
-  const url = `${window.location.origin}${window.location.pathname}${hash.value}`
-
   navigator.share({
-    url: url
+    url: url.value
   })
-
-  navigator.clipboard.writeText(url)
-      .then(() => {
-        shareButtonText.value = 'Копирано в клипборда'
-      })
-      .catch((reason) => {
-        shareButtonText.value = typeof reason === 'string' ? reason : 'Грешка при копирането в клипборда'
-      })
-      .finally(() => {
-        setTimeout(() => {
-          shareButtonText.value = shareButtonTextOG
-        }, 5000)
-      });
 }
 </script>
 
@@ -71,7 +59,7 @@ const share = () => {
       Симулация на крайни автомати
     </h1>
 
-    <button class="btn btn-info mb-3" @click="share">{{ shareButtonText }}</button>
+    <CopyToClipboardButton :text="url" btn-text="Сподели" @click="share"/>
 
     <div class="tabs tabs-lifted" role="tablist">
       <template v-for="(item, key) in items">
