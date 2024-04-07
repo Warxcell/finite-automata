@@ -54,14 +54,19 @@ const share = () => {
 </script>
 
 <template>
-  <div class="container mx-auto">
-    <h1 class="text-center mb-3 text-3xl">
-      Симулация на крайни автомати
-    </h1>
+  <div class="mobile-note my-20 px-3 text-5xl text-center">
+    Приложението не се поддържа на мобилни устройства
+  </div>
+  <div class="container mx-auto px-6">
+    <div class="py-10 px-6 flex flex-wrap text-center justify-between">
+      <h1 class="mb-3 text-3xl">
+        Симулация на крайни автомати
+      </h1>
 
-    <CopyToClipboardButton :text="url" btn-text="Сподели" @click="share"/>
+      <CopyToClipboardButton :text="url" btn-text="Сподели" @click="share"/>
+    </div>
 
-    <div class="tabs tabs-lifted" role="tablist">
+    <div class="tabs tabs-info" role="tablist">
       <template v-for="(item, key) in items">
         <TabTitle
             v-model:title="item.name"
@@ -69,23 +74,25 @@ const share = () => {
             @click="activeTab = key"
             @remove="remove(key)"/>
 
-        <div v-if="activeTab === key" class="tab-content border-base-300 rounded-box p-6" role="tabpanel">
-          <FiniteAutomata
-              v-model:alphabet="item.alphabet"
-              v-model:final-states="item.finalStates"
-              v-model:initial-state="item.initialState"
-              v-model:states="item.states"
-              v-model:transitions="item.transitions"
-              v-model:type="item.type"
-              v-model:words="item.words"
-              :name="item.name"
-          />
+        <div v-if="activeTab === key" class="tab-content border-slate-600 rounded-box p-3" role="tabpanel">
+          <div class="flex flex-wrap gap-3">
+            <FiniteAutomata
+                v-model:alphabet="item.alphabet"
+                v-model:final-states="item.finalStates"
+                v-model:initial-state="item.initialState"
+                v-model:states="item.states"
+                v-model:transitions="item.transitions"
+                v-model:type="item.type"
+                v-model:words="item.words"
+                :name="item.name"
+            />
+          </div>
         </div>
       </template>
 
-      <div class="tab">
-        <div class="tooltip" data-tip="Добави нов прозорец с автомат">
-          <button class="btn btn-success btn-xs btn-outline rounded" @click="add">+</button>
+      <div class="tab py-2">
+        <div class="tooltip w-full" data-tip="Добави нов прозорец с автомат">
+          <button class="btn btn-success btn-block btn-xs btn-outline rounded" @click="add">Добави +</button>
         </div>
       </div>
     </div>
@@ -93,17 +100,42 @@ const share = () => {
 </template>
 
 <style lang="scss" scoped>
+.tabs {
+  align-items: start;
+  grid-template-columns: 20% 80%;
+}
 
-.tabs-boxed {
-  border-radius: var(--rounded-btn, 0.5rem);
-  --tw-bg-opacity: transparent;
-  background-color: transparent;
-  padding: 0;
+.tab {
+  border-radius: 5px 0 0 5px;
+  border-right: none;
+  right: -1px;
+  top: -1px;
+  grid-row: auto;
+  line-height: 1.3em;
+  height: auto;
 }
 
 .tab-content {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  grid-column: 2;
+  grid-row: 1 / 1000;
+  height: 100%;
+}
+
+.mobile-note {
+  display: none;
+}
+
+@media only screen and (max-width: 767px) {
+  body {
+    overflow: hidden;
+
+    .container {
+      display: none;
+    }
+
+    .mobile-note {
+      display: block;
+    }
+  }
 }
 </style>

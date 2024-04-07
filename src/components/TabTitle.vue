@@ -32,19 +32,19 @@ defineEmits<{
 </script>
 
 <template>
-  <div :class="{'tab-active': active}" class="tab" @click="$emit('click')">
+  <div :class="{'tab-active border-slate-600': active}" class="tab p-3 border border-transparent justify-between gap-2 flex-nowrap text-left" @click="$emit('click')">
     <input
         v-if="editable"
         ref="element"
         v-model.lazy="title"
-        class="prevent-select"
-        placeholder="Tab"
+        class="input input-bordered input-xs input-info w-full max-w-xs"
+        placeholder="Име на автомата"
         type="text"
         @change="edit = false"
         @focusout="edit = false"
     />
     <div v-else
-         class="prevent-select"
+         class="prevent-select break-all"
          @dblclick="edit = true"
     >
       {{ title }}
@@ -57,10 +57,6 @@ defineEmits<{
 </template>
 
 <style lang="scss" scoped>
-.tab {
-  flex-wrap: nowrap;
-}
-
 .btn-xs {
   height: 1rem;
   min-height: 1rem;
@@ -70,13 +66,8 @@ defineEmits<{
   line-height: 0.5em;
 }
 
-.prevent-select {
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10 and IE 11 */
-  user-select: none; /* Standard syntax */
-  padding: 0px 5px;
-  font-size: 14px;
-  border: transparent 1px dashed;
+.tab.tab-active:not(.tab-disabled):not([disabled]) {
+  background: #fff;
 }
 
 </style>

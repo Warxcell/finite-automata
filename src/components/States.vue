@@ -39,7 +39,7 @@ const invert = () => {
     <tbody>
 
     <tr v-for="state in states" class="hover">
-      <td><input v-model="initialState" :value="state" class="radio radio-success" type="radio"/></td>
+      <td><input v-model="initialState" :value="state" class="radio radio-info" type="radio"/></td>
       <td><input :id="`${state}-checkbox`" v-model="finalStates" :value="state" class="checkbox checkbox-info"
                  type="checkbox"/></td>
       <td :class="{final: finalStates.includes(state)}">

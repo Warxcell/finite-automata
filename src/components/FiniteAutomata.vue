@@ -196,15 +196,14 @@ const addNewMapping = (sourceState: string, char: string) => {
     <div class="setting-item">
       <h2 class="mx-auto text-2xl">Проверка на дума</h2>
 
-      <div v-if="replayIndex !== null && wordStatuses?.[replayIndex] && initialState">
-        <button class="btn btn-sm btn-outline btn-error" @click="replay(null)">Спри</button>
-
+      <div v-if="replayIndex !== null && wordStatuses?.[replayIndex] && initialState" class="text-center">
         <WordReplay v-model:char-index="stepIndex"
                     :finalStates
                     :initialState
                     :status="wordStatuses[replayIndex]!"
                     :word="words[replayIndex]!"
         />
+        <button class="btn btn-sm uppercase btn-error mt-3" @click="replay(null)">Спри</button>
       </div>
 
       <div v-else class="words">
@@ -247,7 +246,7 @@ const addNewMapping = (sourceState: string, char: string) => {
           </tbody>
         </table>
 
-        <input v-model="newWord" class="input input-bordered input-sm input-info w-full" placeholder="въведи дума"
+        <input v-model="newWord" class="input input-bordered input-sm input-info w-full mt-4" placeholder="въведи дума"
                type="text" @change="addWord"/>
 
         <ClosableError v-if="wordError" :error="wordError" @close="wordError = ''"/>
@@ -263,8 +262,8 @@ const addNewMapping = (sourceState: string, char: string) => {
         </svg>
         <span>Грешка при конструкцията на автомата: {{ fa.error }}</span>
       </div>
-      <div v-else>
-        <h2 class="is-diterm">Aвтомата <strong class="font-bold">{{
+      <div v-else class="flex flex-col gap-2 flex-wrap">
+        <h2 class="mx-auto text-2xl">Aвтомата <strong class="font-bold">{{
             fa.isComplete().isComplete ? "Е" : "НЕ Е"
           }}</strong> напълно
           определен!</h2>
@@ -284,7 +283,7 @@ const addNewMapping = (sourceState: string, char: string) => {
               {{ item.char }}
             </td>
             <td>
-              <select v-model="newMappingTargetState" class="select select-bordered select-sm w-full max-w-xs"
+              <select v-model="newMappingTargetState" class="select select-info select-sm w-full max-w-xs"
                       @change="() => addNewMapping(item.sourceState, item.char)">
                 <option></option>
                 <option v-for="state in states">
@@ -340,10 +339,6 @@ const addNewMapping = (sourceState: string, char: string) => {
   flex-wrap: wrap;
   display: flex;
   gap: 10px;
-
-  .is-diterm {
-    text-align: center;
-  }
 }
 
 .states {

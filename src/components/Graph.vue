@@ -107,11 +107,18 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="graph"></div>
-
-  <CopyToClipboardButton :text="dot" btn-text="Копирай DOT"/>
+  <div class="text-right">
+    <CopyToClipboardButton :text="dot" btn-text="Копирай DOT"/>
+  </div>
+  <div ref="graph" class="graph-holder border border-gray rounded-md"></div>
 </template>
 
 <style lang="scss">
-
+.graph-holder {
+  svg {
+    height: 350px;
+    min-width: 500px;
+    width: 100%;
+  }
+}
 </style>
