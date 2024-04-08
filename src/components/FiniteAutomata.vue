@@ -213,7 +213,7 @@ const addNewMapping = (sourceState: string, char: string) => {
             <th>Дума</th>
             <th>Разпознава ли се?</th>
             <th>
-              <div class="tooltip" data-tip="Проследи автомата с тази дума стъпка по стъпка">
+              <div class="tooltip" data-tip="Проследи с тази дума стъпка по стъпка">
                 Проследи
               </div>
             </th>
@@ -260,10 +260,10 @@ const addNewMapping = (sourceState: string, char: string) => {
                 stroke-linejoin="round"
                 stroke-width="2"/>
         </svg>
-        <span>Грешка при конструкцията на автомата: {{ fa.error }}</span>
+        <span>Грешка при конструкцията на краен автомат: {{ fa.error }}</span>
       </div>
       <div v-else class="flex flex-col gap-2 flex-wrap">
-        <h2 class="mx-auto text-2xl">Aвтомата <strong class="font-bold">{{
+        <h2 class="mx-auto text-2xl">Автоматът <strong class="font-bold">{{
             fa.isComplete().isComplete ? "Е" : "НЕ Е"
           }}</strong> напълно
           определен!</h2>

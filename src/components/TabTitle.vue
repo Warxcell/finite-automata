@@ -50,7 +50,7 @@ defineEmits<{
       {{ title }}
     </div>
 
-    <div class="tooltip" data-tip="Изтрий автомата">
+    <div class="tooltip" data-tip="Изтрий">
       <button class="btn btn-outline btn-error btn-xs rounded" @click="$emit('remove')">-</button>
     </div>
   </div>
