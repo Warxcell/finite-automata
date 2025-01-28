@@ -142,13 +142,12 @@ export class NonDeterministicFiniteAutomata<State extends string, Alphabet exten
         while (states = queue.shift()) {
             const newName = states.join();
 
-            if (!newStates.includes(newName)) {
-                newStates.push(newName);
+            newStates.push(newName);
 
-                if (states.some((item) => includes(_finalStates, item))) {
-                    newFinalStates.push(newName);
-                }
+            if (states.some((item) => includes(_finalStates, item))) {
+                newFinalStates.push(newName);
             }
+
 
             for (let i = 0; i < _alphabet.length; i++) {
                 const char = _alphabet[i]!;
@@ -165,11 +164,11 @@ export class NonDeterministicFiniteAutomata<State extends string, Alphabet exten
 
                 newTargetStateArray.sort()
 
-                const newTargetStateName = newTargetStateArray.join()
-
                 if (!newTargetStateArray.length) {
                     continue;
                 }
+
+                const newTargetStateName = newTargetStateArray.join()
 
                 if (!newStates.includes(newTargetStateName)) {
                     queue.push(newTargetStateArray);
