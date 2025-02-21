@@ -296,6 +296,7 @@ const addNewMapping = (sourceState: string, char: string) => {
         </table>
 
         <Graph
+            v-show="fa instanceof NonDeterministicFiniteAutomata && replayIndex === null"
             :alphabet="fa.alphabet"
             :finalStates="fa.finalStates"
             :highlightStates
