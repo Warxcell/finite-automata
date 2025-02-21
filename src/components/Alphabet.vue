@@ -30,7 +30,3 @@ const {add, remove, newValue, error} = useItems(alphabet);
     <ClosableError v-if="error" :error="error" @close="error = ''"/>
   </div>
 </template>
-
-<style lang="scss" scoped>
-
-</style>

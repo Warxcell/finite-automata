@@ -40,7 +40,3 @@ const copy = () => {
           @mouseleave="alternate = false">{{ alternate ? btnAlternateText : btnText }}
   </button>
 </template>
-
-<style lang="scss" scoped>
-
-</style>
