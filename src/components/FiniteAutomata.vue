@@ -16,6 +16,7 @@ import {useItems} from "@/composables/useItems";
 import {assertNever} from "@/helper";
 import ClosableError from "@/components/ClosableError.vue";
 import WordReplay from "@/components/WordReplay.vue";
+import DeleteButton from "@/components/DeleteButton.vue";
 
 defineProps<{
   name: string
@@ -235,12 +236,7 @@ const addNewMapping = (sourceState: string, char: string) => {
               </button>
             </td>
             <td>
-              <button class="btn btn-error btn-square btn-sm" @click="() => removeWord(word)">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                     xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                </svg>
-              </button>
+              <DeleteButton @click="() => removeWord(word)"/>
             </td>
           </tr>
           </tbody>

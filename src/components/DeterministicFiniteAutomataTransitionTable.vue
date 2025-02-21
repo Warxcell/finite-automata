@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {ref, unref} from "vue";
+import DeleteButton from "@/components/DeleteButton.vue";
 
 defineProps<{
   states: string[]
@@ -59,9 +60,9 @@ const removeMapping = (sourceState: string, char: string) => {
             </select>
           </td>
           <td>
-            <button v-if="mapping[state]?.[char]" class="btn btn-sm btn-square btn-error" @click="() => removeMapping(state, char)">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
+            <DeleteButton v-if="mapping[state]?.[char]"
+                          @click="() => removeMapping(state, char)"
+            />
           </td>
         </tr>
       </template>
@@ -69,7 +70,3 @@ const removeMapping = (sourceState: string, char: string) => {
     </tbody>
   </table>
 </template>
-
-<style lang="scss" scoped>
-
-</style>

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {ref} from "vue";
 import ClosableError from "@/components/ClosableError.vue";
+import DeleteButton from "@/components/DeleteButton.vue";
 
 defineProps<{
   states: string[]
@@ -56,9 +57,7 @@ const removeMapping = (index: number) => {
       <td>{{ state[1] }}</td>
       <td>{{ state[2] }}</td>
       <td>
-        <button class="btn btn-sm btn-square btn-error" @click="() => removeMapping(i)">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-        </button>
+        <DeleteButton @click="() => removeMapping(i)"/>
       </td>
     </tr>
 
@@ -100,7 +99,3 @@ const removeMapping = (index: number) => {
     </tbody>
   </table>
 </template>
-
-<style lang="scss" scoped>
-
-</style>
