@@ -66,15 +66,23 @@ const share = () => {
       <CopyToClipboardButton :text="url" btn-text="Сподели" @click="share"/>
     </div>
 
-    <div class="tabs tabs-info" role="tablist">
+    <div class="tabs tabs-info" role="tablist" aria-label="Табове с автомати">
       <template v-for="(item, key) in items">
         <TabTitle
             v-model:title="item.name"
+            role="tab"
+            :id="`tab-${key}`"
+            :aria-selected="activeTab === key"
+            :aria-controls="`panel-${key}`"
             :active="activeTab === key"
             @click="activeTab = key"
             @remove="remove(key)"/>
 
-        <div v-if="activeTab === key" class="tab-content border-slate-600 rounded-box p-3" role="tabpanel">
+        <div v-show="activeTab === key"
+             :id="`panel-${key}`"
+             :aria-labelledby="`tab-${key}`"
+             class="tab-content border-slate-600 rounded-box p-3"
+             role="tabpanel">
           <div class="flex flex-wrap gap-3">
             <FiniteAutomata
                 v-model:alphabet="item.alphabet"
@@ -92,7 +100,11 @@ const share = () => {
 
       <div class="tab py-2">
         <div class="tooltip w-full" data-tip="Добави нов прозорец с автомат">
-          <button class="btn btn-success btn-block btn-xs btn-outline rounded" @click="add">Добави +</button>
+          <button class="btn btn-success btn-block btn-xs btn-outline rounded"
+                  @click="add"
+                  title="Добави нов таб с краен автомат">
+            Добави +
+          </button>
         </div>
       </div>
     </div>
