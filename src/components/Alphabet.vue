@@ -15,7 +15,7 @@ const {add, remove, newValue, error} = useItems(alphabet);
     <tr v-for="char in alphabet">
       <td>{{ char }}</td>
       <td class="text-right">
-        <DeleteButton @click="() => remove(char)"/>
+        <DeleteButton @click="() => remove(char)" :title="`Изтрий ${char}`"/>
       </td>
     </tr>
     </tbody>

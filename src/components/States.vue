@@ -40,14 +40,27 @@ const invert = () => {
     <tbody>
 
     <tr v-for="state in states" class="hover">
-      <td><input v-model="initialState" :value="state" class="radio radio-info" type="radio"/></td>
-      <td><input :id="`${state}-checkbox`" v-model="finalStates" :value="state" class="checkbox checkbox-info"
-                 type="checkbox"/></td>
+      <td>
+        <input v-model="initialState"
+               :value="state"
+               class="radio radio-info"
+               type="radio"
+               :title="`Маркирай ${state} като начален`"
+        />
+      </td>
+      <td>
+        <input :id="`${state}-checkbox`"
+               v-model="finalStates"
+               :value="state"
+               :title="`Маркирай ${state} като ${finalStates.includes(state) ? 'не-финален' : 'финален'}`"
+               class="checkbox checkbox-info"
+               type="checkbox"/>
+      </td>
       <td :class="{final: finalStates.includes(state)}">
         {{ state }}
       </td>
       <td>
-        <DeleteButton @click="() => remove(state)"/>
+        <DeleteButton @click="() => remove(state)" :title="`Изтрий ${state}`"/>
       </td>
     </tr>
     </tbody>
